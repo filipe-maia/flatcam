@@ -13,7 +13,7 @@
 import logging
 
 version = {
-    "number": 8.9a,
+    "number": 9.0,
     "date": (2016, 7, 1),  # Year, Month, Day
     "name": None,
     "release": False,
