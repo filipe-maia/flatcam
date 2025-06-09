@@ -9,12 +9,12 @@
 from FlatCAMObj import *
 import inspect  # TODO: Remove
 import FlatCAMApp
-from PyQt4 import Qt, QtGui, QtCore
+from PyQt5 import Qt, QtWidgets, QtCore, QtGui
 
 
-class KeySensitiveListView(QtGui.QListView):
+class KeySensitiveListView(QtWidgets.QListView):
     """
-    QtGui.QListView extended to emit a signal on key press.
+    QtWidgets.QListView extended to emit a signal on key press.
     """
 
     keyPressed = QtCore.pyqtSignal(int)
@@ -64,7 +64,7 @@ class ObjectCollection():
         self.promises = set()
 
         ### View
-        #self.view = QtGui.QListView()
+        #self.view = QtWidgets.QListView()
         self.view = KeySensitiveListView()
         self.view.setSelectionMode(Qt.QAbstractItemView.ExtendedSelection)
         self.model = QtGui.QStandardItemModel(self.view)
@@ -162,7 +162,7 @@ class ObjectCollection():
 
         # Create the model item to insert into the QListView
         icon = QtGui.QIcon(self.icons[obj.kind])#self.icons["gerber"])
-        item = QtGui.QStandardItem(icon, str(name))
+        item = QtWidgets.QStandardItem(icon, str(name))
         # Item is not editable, so that double click
         # does not allow cell value modification.
         item.setEditable(False)
@@ -218,10 +218,10 @@ class ObjectCollection():
 
         # TODO: Move the operation out of here.
 
-        xmin = Inf
-        ymin = Inf
-        xmax = -Inf
-        ymax = -Inf
+        xmin = inf
+        ymin = inf
+        xmax = -inf
+        ymax = -inf
 
         for obj in self.object_list:
             try:
@@ -293,7 +293,7 @@ class ObjectCollection():
         :return: None
         """
         iobj = self.model.createIndex(self.get_names().index(name), 0)  # Column 0
-        self.view.selectionModel().select(iobj, QtGui.QItemSelectionModel.Select)
+        self.view.selectionModel().select(iobj, QtWidgets.QItemSelectionModel.Select)
 
     def set_inactive(self, name):
         """
@@ -304,7 +304,7 @@ class ObjectCollection():
         :return: None
         """
         iobj = self.model.createIndex(self.get_names().index(name), 0)  # Column 0
-        self.view.selectionModel().select(iobj, QtGui.QItemSelectionModel.Deselect)
+        self.view.selectionModel().select(iobj, QtWidgets.QItemSelectionModel.Deselect)
 
     def set_all_inactive(self):
         """

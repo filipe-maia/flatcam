@@ -6,7 +6,7 @@
 # MIT Licence                                              #
 ############################################################
 
-from PyQt4 import QtGui, QtCore, Qt
+from PyQt5 import QtWidgets, QtCore, Qt, QtGui
 import FlatCAMApp
 from camlib import *
 from FlatCAMTool import FlatCAMTool
@@ -15,13 +15,13 @@ from ObjectUI import LengthEntry, RadioSet
 from shapely.geometry import Polygon, LineString, Point, LinearRing
 from shapely.geometry import MultiPoint, MultiPolygon
 from shapely.geometry import box as shply_box
-from shapely.ops import cascaded_union, unary_union
+from shapely.ops import unary_union
 import shapely.affinity as affinity
 from shapely.wkt import loads as sloads
 from shapely.wkt import dumps as sdumps
 from shapely.geometry.base import BaseGeometry
 
-from numpy import arctan2, Inf, array, sqrt, pi, ceil, sin, cos, sign, dot
+from numpy import arctan2, inf, array, sqrt, pi, ceil, sin, cos, sign, dot
 from numpy.linalg import solve
 
 #from mpl_toolkits.axes_grid.anchored_artists import AnchoredDrawingArea
@@ -44,11 +44,11 @@ class BufferSelectionTool(FlatCAMTool):
         self.fcdraw = fcdraw
 
         ## Title
-        title_label = QtGui.QLabel("<font size=4><b>%s</b></font>" % self.toolName)
+        title_label = QtWidgets.QLabel("<font size=4><b>%s</b></font>" % self.toolName)
         self.layout.addWidget(title_label)
 
         ## Form Layout
-        form_layout = QtGui.QFormLayout()
+        form_layout = QtWidgets.QFormLayout()
         self.layout.addLayout(form_layout)
 
         ## Buffer distance
@@ -56,10 +56,10 @@ class BufferSelectionTool(FlatCAMTool):
         form_layout.addRow("Buffer distance:", self.buffer_distance_entry)
 
         ## Buttons
-        hlay = QtGui.QHBoxLayout()
+        hlay = QtWidgets.QHBoxLayout()
         self.layout.addLayout(hlay)
         hlay.addStretch()
-        self.buffer_button = QtGui.QPushButton("Buffer")
+        self.buffer_button = QtWidgets.QPushButton("Buffer")
         hlay.addWidget(self.buffer_button)
 
         self.layout.addStretch()
@@ -86,15 +86,15 @@ class PaintOptionsTool(FlatCAMTool):
         self.fcdraw = fcdraw
 
         ## Title
-        title_label = QtGui.QLabel("<font size=4><b>%s</b></font>" % self.toolName)
+        title_label = QtWidgets.QLabel("<font size=4><b>%s</b></font>" % self.toolName)
         self.layout.addWidget(title_label)
 
         ## Form Layout
-        form_layout = QtGui.QFormLayout()
+        form_layout = QtWidgets.QFormLayout()
         self.layout.addLayout(form_layout)
 
         # Tool dia
-        ptdlabel = QtGui.QLabel('Tool dia:')
+        ptdlabel = QtWidgets.QLabel('Tool dia:')
         ptdlabel.setToolTip(
             "Diameter of the tool to\n"
             "be used in the operation."
@@ -104,7 +104,7 @@ class PaintOptionsTool(FlatCAMTool):
         form_layout.addRow(ptdlabel, self.painttooldia_entry)
 
         # Overlap
-        ovlabel = QtGui.QLabel('Overlap:')
+        ovlabel = QtWidgets.QLabel('Overlap:')
         ovlabel.setToolTip(
             "How much (fraction) of the tool\n"
             "width to overlap each tool pass."
@@ -114,7 +114,7 @@ class PaintOptionsTool(FlatCAMTool):
         form_layout.addRow(ovlabel, self.paintoverlap_entry)
 
         # Margin
-        marginlabel = QtGui.QLabel('Margin:')
+        marginlabel = QtWidgets.QLabel('Margin:')
         marginlabel.setToolTip(
             "Distance by which to avoid\n"
             "the edges of the polygon to\n"
@@ -125,7 +125,7 @@ class PaintOptionsTool(FlatCAMTool):
         form_layout.addRow(marginlabel, self.paintmargin_entry)
 
         # Method
-        methodlabel = QtGui.QLabel('Method:')
+        methodlabel = QtWidgets.QLabel('Method:')
         methodlabel.setToolTip(
             "Algorithm to paint the polygon:<BR>"
             "<B>Standard</B>: Fixed step inwards.<BR>"
@@ -139,10 +139,10 @@ class PaintOptionsTool(FlatCAMTool):
         form_layout.addRow(methodlabel, self.paintmethod_combo)
 
         ## Buttons
-        hlay = QtGui.QHBoxLayout()
+        hlay = QtWidgets.QHBoxLayout()
         self.layout.addLayout(hlay)
         hlay.addStretch()
-        self.paint_button = QtGui.QPushButton("Paint")
+        self.paint_button = QtWidgets.QPushButton("Paint")
         hlay.addWidget(self.paint_button)
 
         self.layout.addStretch()
@@ -692,7 +692,7 @@ class FlatCAMDraw(QtCore.QObject):
         self.axes = self.canvas.new_axes("draw")
 
         ### Drawing Toolbar ###
-        self.drawing_toolbar = QtGui.QToolBar("Draw Toolbar")
+        self.drawing_toolbar = QtWidgets.QToolBar("Draw Toolbar")
         self.drawing_toolbar.setDisabled(disabled)
         self.app.ui.addToolBar(self.drawing_toolbar)
 
@@ -720,7 +720,7 @@ class FlatCAMDraw(QtCore.QObject):
 
         ### Snap Toolbar ###
 
-        self.snap_toolbar = QtGui.QToolBar("Grid Toolbar")
+        self.snap_toolbar = QtWidgets.QToolBar("Grid Toolbar")
         self.grid_snap_btn = self.snap_toolbar.addAction(QtGui.QIcon('share/grid32.png'), 'Snap to grid')
         self.grid_gap_x_entry = FCEntry()
 
@@ -744,7 +744,7 @@ class FlatCAMDraw(QtCore.QObject):
         self.app.ui.addToolBar(self.snap_toolbar)
 
         ### Application menu ###
-        self.menu = QtGui.QMenu("Drawing")
+        self.menu = QtWidgets.QMenu("Drawing")
         self.app.ui.menu.insertMenu(self.app.ui.menutoolaction, self.menu)
         # self.select_menuitem = self.menu.addAction(QtGui.QIcon('share:pointer16.png'), "Select 'Esc'")
         # self.add_circle_menuitem = self.menu.addAction(QtGui.QIcon('share:circle16.png'), 'Add Circle')
@@ -925,7 +925,7 @@ class FlatCAMDraw(QtCore.QObject):
     def cutpath(self):
         selected = self.get_selected()
         tools = selected[1:]
-        toolgeo = cascaded_union([shp.geo for shp in tools])
+        toolgeo = unary_union([shp.geo for shp in tools])
 
         target = selected[0]
         if type(target.geo) == Polygon:
@@ -1359,7 +1359,7 @@ class FlatCAMDraw(QtCore.QObject):
         """
 
         snap_x, snap_y = (x, y)
-        snap_distance = Inf
+        snap_distance = inf
 
         ### Object (corner?) snap
         ### No need for the objects, just the coordinates
@@ -1413,7 +1413,7 @@ class FlatCAMDraw(QtCore.QObject):
         :return: None.
         """
 
-        results = cascaded_union([t.geo for t in self.get_selected()])
+        results = unary_union([t.geo for t in self.get_selected()])
 
         # Delete originals.
         for_deletion = [s for s in self.get_selected()]
@@ -1456,7 +1456,7 @@ class FlatCAMDraw(QtCore.QObject):
     def subtract(self):
         selected = self.get_selected()
         tools = selected[1:]
-        toolgeo = cascaded_union([shp.geo for shp in tools])
+        toolgeo = unary_union([shp.geo for shp in tools])
         result = selected[0].geo.difference(toolgeo)
 
         self.delete_shape(selected[0])
@@ -1475,7 +1475,7 @@ class FlatCAMDraw(QtCore.QObject):
             self.app.inform.emit("[warning] Invalid distance for buffering.")
             return
 
-        pre_buffer = cascaded_union([t.geo for t in selected])
+        pre_buffer = unary_union([t.geo for t in selected])
         results = pre_buffer.buffer(buf_distance)
         self.add_shape(DrawToolShape(results))
 
@@ -1528,7 +1528,7 @@ class FlatCAMDraw(QtCore.QObject):
                 if cp is not None:
                     local_results += list(cp.get_objects())
 
-                results.append(cascaded_union(local_results))
+                results.append(unary_union(local_results))
 
         # This is a dirty patch:
         for r in results:

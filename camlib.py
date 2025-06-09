@@ -10,7 +10,7 @@
 #import traceback
 
 from io import StringIO
-from numpy import arctan2, Inf, array, sqrt, pi, ceil, sin, cos, dot, float32, \
+from numpy import arctan2, inf, array, sqrt, pi, ceil, sin, cos, dot, float32, \
     transpose
 from numpy.linalg import solve, norm
 from matplotlib.figure import Figure
@@ -31,7 +31,7 @@ from rtree import index as rtindex
 from shapely.geometry import Polygon, LineString, Point, LinearRing
 from shapely.geometry import MultiPoint, MultiPolygon
 from shapely.geometry import box as shply_box
-from shapely.ops import cascaded_union, unary_union
+from shapely.ops import unary_union
 import shapely.affinity as affinity
 from shapely.wkt import loads as sloads
 from shapely.wkt import dumps as sdumps
@@ -192,14 +192,14 @@ class Geometry(object):
         flat_geometry = self.flatten(pathonly=True)
         log.debug("%d paths" % len(flat_geometry))
         polygon=Polygon(points)
-        toolgeo=cascaded_union(polygon)
+        toolgeo=unary_union(polygon)
         diffs=[]
         for target in flat_geometry:
             if type(target) == LineString or type(target) == LinearRing:
                 diffs.append(target.difference(toolgeo))
             else:
                 log.warning("Not implemented.")
-        self.solid_geometry=cascaded_union(diffs)
+        self.solid_geometry=unary_union(diffs)
 
     def bounds(self):
         """
@@ -216,7 +216,7 @@ class Geometry(object):
             if len(self.solid_geometry) == 0:
                 log.debug('solid_geometry is empty []')
                 return 0, 0, 0, 0
-            return cascaded_union(self.solid_geometry).bounds
+            return unary_union(self.solid_geometry).bounds
         else:
             return self.solid_geometry.bounds
 
@@ -443,14 +443,14 @@ class Geometry(object):
             self.solid_geometry = []
 
         if type(self.solid_geometry) is list:
-            # self.solid_geometry.append(cascaded_union(geos))
+            # self.solid_geometry.append(unary_union(geos))
             if type(geos) is list:
                 self.solid_geometry += geos
             else:
                 self.solid_geometry.append(geos)
         else:  # It's shapely geometry
-            # self.solid_geometry = cascaded_union([self.solid_geometry,
-            #                                       cascaded_union(geos)])
+            # self.solid_geometry = unary_union([self.solid_geometry,
+            #                                       unary_union(geos)])
             self.solid_geometry = [self.solid_geometry, geos]
 
     def size(self):
@@ -1002,7 +1002,7 @@ class Geometry(object):
 
         :return: None
         """
-        self.solid_geometry = [cascaded_union(self.solid_geometry)]
+        self.solid_geometry = [unary_union(self.solid_geometry)]
 
     def export_svg(self, scale_factor=0.00):
         """
@@ -1011,7 +1011,7 @@ class Geometry(object):
         :return: SVG Element
         """
         # Make sure we see a Shapely Geometry class and not a list
-        geom = cascaded_union(self.flatten())
+        geom = unary_union(self.flatten())
 
         # scale_factor is a multiplication factor for the SVG stroke-width used within shapely's svg export
 
@@ -1405,13 +1405,13 @@ class ApertureMacro:
             if r <= 0:
                 break
             ring = Point((x, y)).buffer(r).exterior.buffer(thickness/2.0)
-            result = cascaded_union([result, ring])
+            result = unary_union([result, ring])
             i += 1
 
         ## Crosshair
         hor = LineString([(x - cross_len, y), (x + cross_len, y)]).buffer(cross_th/2.0, cap_style=2)
         ver = LineString([(x, y-cross_len), (x, y + cross_len)]).buffer(cross_th/2.0, cap_style=2)
-        result = cascaded_union([result, hor, ver])
+        result = unary_union([result, hor, ver])
 
         return {"pol": 1, "geometry": result}
 
@@ -1868,7 +1868,7 @@ class Gerber (Geometry):
         path = []
 
         # Polygons are stored here until there is a change in polarity.
-        # Only then they are combined via cascaded_union and added or
+        # Only then they are combined via unary_union and added or
         # subtracted from solid_geometry. This is ~100 times faster than
         # applyng a union for every new polygon.
         poly_buffer = []
@@ -2346,9 +2346,9 @@ class Gerber (Geometry):
                     # TODO: Remove when bug fixed
                     if len(poly_buffer) > 0:
                         if current_polarity == 'D':
-                            self.solid_geometry = self.solid_geometry.union(cascaded_union(poly_buffer))
+                            self.solid_geometry = self.solid_geometry.union(unary_union(poly_buffer))
                         else:
-                            self.solid_geometry = self.solid_geometry.difference(cascaded_union(poly_buffer))
+                            self.solid_geometry = self.solid_geometry.difference(unary_union(poly_buffer))
                         poly_buffer = []
 
                     current_polarity = match.group(1)
@@ -2429,7 +2429,7 @@ class Gerber (Geometry):
                 log.warn("Union(buffer) done.")
             else:
                 log.debug("Union by union()...")
-                new_poly = cascaded_union(poly_buffer)
+                new_poly = unary_union(poly_buffer)
                 new_poly = new_poly.buffer(0)
                 log.warn("Union done.")
             if current_polarity == 'D':
@@ -2480,7 +2480,7 @@ class Gerber (Geometry):
                 p2 = Point(loc[0], loc[1] - 0.5 * (height - width))
                 c1 = p1.buffer(width * 0.5)
                 c2 = p2.buffer(width * 0.5)
-            return cascaded_union([c1, c2]).convex_hull
+            return unary_union([c1, c2]).convex_hull
 
         if aperture['type'] == 'P':  # Regular polygon
             loc = location.coords[0]
@@ -2523,7 +2523,7 @@ class Gerber (Geometry):
         #
         # self.do_flashes()
         #
-        # self.solid_geometry = cascaded_union(self.buffered_paths +
+        # self.solid_geometry = unary_union(self.buffered_paths +
         #                                      [poly['polygon'] for poly in self.regions] +
         #                                      self.flash_geometry)
 
@@ -3542,7 +3542,7 @@ class CNCjob(Geometry):
         
     def create_geometry(self):
         # TODO: This takes forever. Too much data?
-        self.solid_geometry = cascaded_union([geo['geom'] for geo in self.gcode_parsed])
+        self.solid_geometry = unary_union([geo['geom'] for geo in self.gcode_parsed])
 
     def linear2gcode(self, linear, tolerance=0, down=True, up=True,
                      zcut=None, ztravel=None, downrate=None,
@@ -3755,13 +3755,13 @@ class CNCjob(Geometry):
             if g['kind'][0] == 'T': travels.append(g)
 
         # Used to determine the overall board size
-        self.solid_geometry = cascaded_union([geo['geom'] for geo in self.gcode_parsed])
+        self.solid_geometry = unary_union([geo['geom'] for geo in self.gcode_parsed])
 
         # Convert the cuts and travels into single geometry objects we can render as svg xml
         if travels:
-            travelsgeom = cascaded_union([geo['geom'] for geo in travels])
+            travelsgeom = unary_union([geo['geom'] for geo in travels])
         if cuts:
-            cutsgeom = cascaded_union([geo['geom'] for geo in cuts])
+            cutsgeom = unary_union([geo['geom'] for geo in cuts])
 
         # Render the SVG Xml
         # The scale factor affects the size of the lines, and the stroke color adds different formatting for each set
@@ -3775,10 +3775,10 @@ class CNCjob(Geometry):
         return svg_elem
 
 # def get_bounds(geometry_set):
-#     xmin = Inf
-#     ymin = Inf
-#     xmax = -Inf
-#     ymax = -Inf
+#     xmin = inf
+#     ymin = inf
+#     xmax = -inf
+#     ymax = -inf
 #
 #     #print "Getting bounds of:", str(geometry_set)
 #     for gs in geometry_set:
@@ -3794,10 +3794,10 @@ class CNCjob(Geometry):
 #     return [xmin, ymin, xmax, ymax]
 
 def get_bounds(geometry_list):
-    xmin = Inf
-    ymin = Inf
-    xmax = -Inf
-    ymax = -Inf
+    xmin = inf
+    ymin = inf
+    xmax = -inf
+    ymax = -inf
 
     #print "Getting bounds of:", str(geometry_set)
     for gs in geometry_list:

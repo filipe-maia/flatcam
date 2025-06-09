@@ -7,7 +7,7 @@
 ############################################################
 
 from io import StringIO
-from PyQt4 import QtCore
+from PyQt5 import QtCore
 from copy import copy
 from ObjectUI import *
 import FlatCAMApp
@@ -477,7 +477,7 @@ class FlatCAMGerber(FlatCAMObj, Gerber):
                            [pts[6], pts[7], pts[8]],
                            [pts[9], pts[10], pts[11]]]}
             cuts = cases[self.options['gaps']]
-            geo_obj.solid_geometry = cascaded_union([LineString(segment) for segment in cuts])
+            geo_obj.solid_geometry = unary_union([LineString(segment) for segment in cuts])
 
         # TODO: Check for None
         self.app.new_object("geometry", name, geo_init)
@@ -798,12 +798,12 @@ class FlatCAMExcellon(FlatCAMObj, Excellon):
                 if drill.get('tool') == tool:
                     drill_cnt += 1
 
-            id = QtGui.QTableWidgetItem(tool)
+            id = QtWidgets.QTableWidgetItem(tool)
             id.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             self.ui.tools_table.setItem(i, 0, id)  # Tool name/id
-            dia = QtGui.QTableWidgetItem(str(self.tools[tool]['C']))
+            dia = QtWidgets.QTableWidgetItem(str(self.tools[tool]['C']))
             dia.setFlags(QtCore.Qt.ItemIsEnabled)
-            drill_count = QtGui.QTableWidgetItem('%d' % drill_cnt)
+            drill_count = QtWidgets.QTableWidgetItem('%d' % drill_cnt)
             drill_count.setFlags(QtCore.Qt.ItemIsEnabled)
             self.ui.tools_table.setItem(i, 1, dia)  # Diameter
             self.ui.tools_table.setItem(i, 2, drill_count)  # Number of drills per tool
@@ -817,9 +817,9 @@ class FlatCAMExcellon(FlatCAMObj, Excellon):
         self.ui.tools_table.resizeColumnsToContents()
         self.ui.tools_table.resizeRowsToContents()
         horizontal_header = self.ui.tools_table.horizontalHeader()
-        horizontal_header.setResizeMode(0, QtGui.QHeaderView.ResizeToContents)
-        horizontal_header.setResizeMode(1, QtGui.QHeaderView.Stretch)
-        horizontal_header.setResizeMode(2, QtGui.QHeaderView.ResizeToContents)
+        horizontal_header.setResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+        horizontal_header.setResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        horizontal_header.setResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
         # horizontal_header.setStretchLastSection(True)
         self.ui.tools_table.verticalHeader().hide()
         self.ui.tools_table.setSortingEnabled(True)
@@ -1117,10 +1117,10 @@ class FlatCAMCNCjob(FlatCAMObj, CNCjob):
         self.read_form()
 
         try:
-            filename = str(QtGui.QFileDialog.getSaveFileName(caption="Export G-Code ...",
+            filename = str(QtWidgets.QFileDialog.getSaveFileName(caption="Export G-Code ...",
                                                          directory=self.app.defaults["last_folder"]))
         except TypeError:
-            filename = str(QtGui.QFileDialog.getSaveFileName(caption="Export G-Code ..."))
+            filename = str(QtWidgets.QFileDialog.getSaveFileName(caption="Export G-Code ..."))
 
         preamble = str(self.ui.prepend_text.get_value())
         postamble = str(self.ui.append_text.get_value())
