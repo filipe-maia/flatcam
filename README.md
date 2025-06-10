@@ -39,31 +39,6 @@ TODO:
 [WARNING] Union(buffer) done.
 [DEBUG][Dummy-2] 0.241575 seconds executing initialize().
 ```
-```
-[DEBUG][Dummy-2] FCVisibleProcessContainer.on_done()
-Traceback (most recent call last):
-  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMWorker.py", line 62, in do_worker_task
-    raise e
-  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMWorker.py", line 59, in do_worker_task
-    task['fcn'](*task['params'])
-  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMObj.py", line 1595, in job_thread
-    app_obj.new_object("cncjob", outname, job_init)
-  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMApp.py", line 1074, in new_object
-    initialize(obj, self)
-  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMObj.py", line 1581, in job_init
-    job_obj.generate_from_geometry_2(self,
-  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 3245, in generate_from_geometry_2
-    storage.insert(shape)
-  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 4353, in insert
-    super(FlatCAMRTreeStorage, self).insert(idx, obj)
-  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 4306, in insert
-    for pt in self.get_points(obj):
-  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 3235, in get_pts
-    return [o.coords[0], o.coords[-1]]
-  File "/home/v00efmem/.local/lib/python3.10/site-packages/shapely/geometry/base.py", line 1033, in coords
-    raise NotImplementedError(
-NotImplementedError: Sub-geometries may have coordinate sequences, but multi-part geometries do not
-```
 
 TODO: After clicking on button to generate CNC:
 ```

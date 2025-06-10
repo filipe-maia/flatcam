@@ -978,18 +978,31 @@ class App(QtCore.QObject):
         dlg.setText(message)
         dlg.exec_()
 
+    # Example of a filename received and of a filepathandname returned:
+    #     "('\home\user\file.example', 'All Files (*)')"
+    #     "\home\user\file.example"
+    # Another example:
+    #     "('C:\Users\user\file.example', 'All Files (*)')"
+    #     "C:\Users\user\file.example"
+    # TODO improve this function
+    def extract_file_name_with_path(self, filename):
+        filepathandname = filename
+        try:
+            if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+                self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+                filepathandname = filename[len("('"):filename.find("', '")]
+                self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        except NoneType:
+            return filename
+        return filepathandname
+
     def register_recent(self, kind, filename):
 
         self.log.debug("register_recent()")
         self.log.debug("   %s" % kind)
         self.log.debug("   %s" % filename)
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         record = {'kind': str(kind), 'filename': str(filepathandname)}
         if record in self.recent:
@@ -1738,12 +1751,7 @@ class App(QtCore.QObject):
         # TODO: Improve the serialization methods and remove this fix.
         filename = str(filename)
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         if filepathandname == "":
             self.inform.emit("Open cancelled.")
@@ -1772,12 +1780,7 @@ class App(QtCore.QObject):
         # TODO: Improve the serialization methods and remove this fix.
         filename = str(filename)
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         if filepathandname == "":
             self.inform.emit("Open cancelled.")
@@ -1806,12 +1809,7 @@ class App(QtCore.QObject):
         # TODO: Improve the serialization methods and remove this fix.
         filename = str(filename)
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         if filepathandname == "":
             self.inform.emit("Open cancelled.")
@@ -1840,12 +1838,7 @@ class App(QtCore.QObject):
         # TODO: Improve the serialization methods and remove this fix.
         filename = str(filename)
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         if filepathandname == "":
             self.inform.emit("Open cancelled.")
@@ -1897,12 +1890,7 @@ class App(QtCore.QObject):
 
         filename = str(filename)
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         if filepathandname == "":
             self.inform.emit("Export SVG cancelled.")
@@ -1927,12 +1915,7 @@ class App(QtCore.QObject):
 
         filename = str(filename)
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         if filepathandname == "":
             self.inform.emit("Open cancelled.")
@@ -1976,12 +1959,7 @@ class App(QtCore.QObject):
 
         filename = str(filename)
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         try:
             f = open(filepathandname, 'r')
@@ -2019,12 +1997,7 @@ class App(QtCore.QObject):
 
         self.log.debug("export_svg()")
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         try:
             obj = self.collection.get_by_name(str(obj_name))
@@ -2076,12 +2049,7 @@ class App(QtCore.QObject):
 
         self.log.debug("import_svg()")
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         def obj_init(geo_obj, app_obj):
 
@@ -2117,12 +2085,7 @@ class App(QtCore.QObject):
 
         App.log.debug("open_gerber()")
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         # How the object should be initialized
         def obj_init(gerber_obj, app_obj):
@@ -2193,12 +2156,7 @@ class App(QtCore.QObject):
 
         App.log.debug("open_excellon()")
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         #self.progress.emit(10)
 
@@ -2262,12 +2220,7 @@ class App(QtCore.QObject):
         """
         App.log.debug("open_gcode()")
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         # How the object should be initialized
         def obj_init(job_obj, app_obj_):
@@ -2340,12 +2293,7 @@ class App(QtCore.QObject):
         """
         App.log.debug("Opening project: " + filename)
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         ## Open and parse
         try:
@@ -4449,12 +4397,7 @@ class App(QtCore.QObject):
         """
         self.log.debug("save_project()")
 
-        # TODO improve the next 5 lines of code
-        filepathandname = filename
-        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
-            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-            filepathandname = filename[len("('"):filename.find("', '")]
-            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        filepathandname = self.extract_file_name_with_path(filename)
 
         ## Capture the latest changes
         # Current object
