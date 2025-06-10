@@ -1664,8 +1664,13 @@ class FlatCAMGeometry(FlatCAMObj, Geometry):
 
     def plot_element(self, element):
         try:
-            for sub_el in element:
-                self.plot_element(sub_el)
+
+            if str(type(element)) == "<class 'shapely.geometry.multilinestring.MultiLineString'>" or str(type(element)) == "<class 'shapely.geometry.multipolygon.MultiPolygon'>":
+                for sub_el in element.geoms:
+                    self.plot_element(sub_el)
+            else:
+                for sub_el in element:
+                    self.plot_element(sub_el)
 
         except TypeError:  # Element is not iterable...
 
@@ -1682,7 +1687,7 @@ class FlatCAMGeometry(FlatCAMObj, Geometry):
                 self.axes.plot(x, y, 'r-')
                 return
 
-            FlatCAMApp.App.log.warning("Did not plot:" + str(type(element)))
+            FlatCAMApp.App.log.error("Did not plot: " + str(type(element)))
 
     def plot(self):
         """

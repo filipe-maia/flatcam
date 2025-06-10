@@ -15,16 +15,98 @@ To start this program run 'py flatcam' or 'python flatcam'.
 
 TODO:
 ```
+[DEBUG][MainThread] Radio toggled
+[WARNING][MainThread] Tried to set an option or field that does not exist: use_buffer_for_union
+```
+```
 [DEBUG][MainThread] on_generatecutout_button_click--> FlatCAMObj.read_form()
 [WARNING][MainThread] Failed to read option from field: use_buffer_for_union
 ```
-
-TODO: After clicking on button to generate geometry:
 ```
-[DEBUG][MainThread] FlatCAMGeometry.set_ui()
-[DEBUG][Dummy-38] A new object is available. Should plot it!
+[DEBUG][MainThread] on_iso_button_click--> FlatCAMObj.read_form()
+[WARNING][MainThread] Failed to read option from field: use_buffer_for_union
+```
+```
+...
+[DEBUG] {'type': 'C', 'size': 2.286}
+[DEBUG] Line 608: Aperture change to (29)
+[DEBUG] {'type': 'C', 'size': 1.27}
+[DEBUG] {'type': 'C', 'size': 1.27}
+[WARNING] Joining 213 polygons.
+[DEBUG] Union by buffer...
+[WARNING] Union(buffer) done.
+[DEBUG][Dummy-2] 0.241575 seconds executing initialize().
+```
+```
+[DEBUG][Dummy-2] FCVisibleProcessContainer.on_done()
+Traceback (most recent call last):
+  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMWorker.py", line 62, in do_worker_task
+    raise e
+  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMWorker.py", line 59, in do_worker_task
+    task['fcn'](*task['params'])
+  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMObj.py", line 1595, in job_thread
+    app_obj.new_object("cncjob", outname, job_init)
+  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMApp.py", line 1074, in new_object
+    initialize(obj, self)
+  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMObj.py", line 1581, in job_init
+    job_obj.generate_from_geometry_2(self,
+  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 3245, in generate_from_geometry_2
+    storage.insert(shape)
+  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 4353, in insert
+    super(FlatCAMRTreeStorage, self).insert(idx, obj)
+  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 4306, in insert
+    for pt in self.get_points(obj):
+  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 3235, in get_pts
+    return [o.coords[0], o.coords[-1]]
+  File "/home/v00efmem/.local/lib/python3.10/site-packages/shapely/geometry/base.py", line 1033, in coords
+    raise NotImplementedError(
+NotImplementedError: Sub-geometries may have coordinate sequences, but multi-part geometries do not
+```
+```
+[DEBUG][MainThread] save_project()
+[DEBUG][MainThread] save_project--> FlatCAMObj.read_form()
+[ERROR][MainThread] [error] Failed to open file for saving: ('/mnt/EA56F2E856F2B483/flatcam/examples/gerber/gerber', 'All Files (*)')
+[DEBUG][MainThread] register_recent()
+[DEBUG][MainThread]    project
+[DEBUG][MainThread]    ('/mnt/EA56F2E856F2B483/flatcam/examples/gerber/gerber', 'All Files (*)')
+[DEBUG][MainThread] setup_recent_items()
+[DEBUG][MainThread] save_project()
+[DEBUG][MainThread] save_project--> FlatCAMObj.read_form()
+[ERROR][MainThread] [error] Failed to open file for saving: ('/mnt/EA56F2E856F2B483/flatcam/examples/gerber/gerber', 'All Files (*)')
+```
+
+
+TODO: After clicking on button to generate CNC:
+```
 [DEBUG][MainThread] plot --> FlatCAMObj.plot()
-[WARNING][MainThread] Did not plot:<class 'shapely.geometry.multilinestring.MultiLineString'>
+[WARNING][MainThread] A geometry component was not a polygon:
+[WARNING][MainThread] MULTIPOLYGON (((...)))
+```
+and after clicking a second time:
+```
+[DEBUG][Dummy-2] FCVisibleProcessContainer.on_done()
+Traceback (most recent call last):
+  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMWorker.py", line 62, in do_worker_task
+    raise e
+  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMWorker.py", line 59, in do_worker_task
+    task['fcn'](*task['params'])
+  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMObj.py", line 1595, in job_thread
+    app_obj.new_object("cncjob", outname, job_init)
+  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMApp.py", line 1074, in new_object
+    initialize(obj, self)
+  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMObj.py", line 1581, in job_init
+    job_obj.generate_from_geometry_2(self,
+  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 3245, in generate_from_geometry_2
+    storage.insert(shape)
+  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 4353, in insert
+    super(FlatCAMRTreeStorage, self).insert(idx, obj)
+  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 4306, in insert
+    for pt in self.get_points(obj):
+  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 3235, in get_pts
+    return [o.coords[0], o.coords[-1]]
+  File "/home/v00efmem/.local/lib/python3.10/site-packages/shapely/geometry/base.py", line 1033, in coords
+    raise NotImplementedError(
+NotImplementedError: Sub-geometries may have coordinate sequences, but multi-part geometries do not
 ```
 
 TODO: This error happens sometimes while starting flatcam, but application doesn't seem to bug out, so this is a minor bug.
@@ -55,11 +137,8 @@ C:\flatcam\ToolTransform.py:310: SyntaxWarning: "is" with 'str' literal. Did you
 [INFO][MainThread] FlatCAM Starting...
 ```
 
-TODO: This/These error(s) happen(s) sometimes while starting flatcam, and re-starting it usually solves it/them, so this/these is/are (a) minor bug(s):
+TODO: This error happens sometimes while starting flatcam, and re-starting it usually solves it, so this is a minor bug:
 ```
-C:\flatcam\FlatCAMObj.py:748: SyntaxWarning: "is not" with 'str' literal. Did you mean "!="?
-  if option is not 'name':
-...
 Traceback (most recent call last):
   File "C:\flatcam\GUIElements.py", line 47, in on_toggle
     if radio.isChecked():
