@@ -1,7 +1,7 @@
-# This file contains python only requirements to be installed with pip
+# This file contains python only requirements to be installed with pip.
 # Python pacakges that cannot be installed with pip are not included.
 # Usage: pip install -r requirements.txt
-# P.S.: Are 'sip', 'shapely', 'pywin32' and 'filefinder' also required?
+# P.S.: Are 'sip' and 'filefinder' also required?
 #sip
 pyqt5
 numpy>=1.8
@@ -12,5 +12,4 @@ rtree
 scipy
 svg.path
 shapely
-pywin32
 #filefinder

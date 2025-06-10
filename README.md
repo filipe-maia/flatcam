@@ -20,3 +20,29 @@ Traceback (most recent call last):
     if radio.isChecked():
        ^^^^^^^^^^^^^^^
 AttributeError: 'QThread' object has no attribute 'isChecked'
+
+TODO:
+Traceback (most recent call last):
+  File "C:\flatcam\FlatCAMApp.py", line 2063, in obj_init
+    gerber_obj.parse_file(filename, follow=follow)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\flatcam\camlib.py", line 1824, in parse_file
+    with open(filename, 'r') as gfile:
+         ~~~~^^^^^^^^^^^^^^^
+OSError: [Errno 22] Invalid argument: "('C:/flatcam/wi.gbr', 'All Files (*)')"
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "C:\flatcam\FlatCAMWorker.py", line 62, in do_worker_task
+    raise e
+  File "C:\flatcam\FlatCAMWorker.py", line 59, in do_worker_task
+    task['fcn'](*task['params'])
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\flatcam\FlatCAMApp.py", line 2100, in open_gerber
+    self.new_object("gerber", name, obj_init)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\flatcam\FlatCAMApp.py", line 1081, in new_object
+    initialize(obj, self)
+    ~~~~~~~~~~^^^^^^^^^^^
+  File "C:\flatcam\FlatCAMApp.py", line 2068, in obj_init
+    raise IOError('Failed to open file: ' + filename)
+OSError: Failed to open file: ('C:/flatcam/wi.gbr', 'All Files (*)')

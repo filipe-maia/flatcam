@@ -1,0 +1,5 @@
+# This file contains python only requirements to be installed with pip on Windows.
+# Python pacakges that cannot be installed with pip are not included.
+# Usage: pip install -r requirements_windows.txt
+# P.S.: Is 'pywin32' required?
+pywin32

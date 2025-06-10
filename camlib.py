@@ -1821,6 +1821,9 @@ class Gerber (Geometry):
         :return: None
         """
 
+        print("[DEBUG] Will try to parse this file: <" + filename + ">.")
+        #try:
+
         with open(filename, 'r') as gfile:
 
             def line_generator():
@@ -1847,6 +1850,18 @@ class Gerber (Geometry):
                             break
 
             self.parse_lines(line_generator(), follow=follow)
+
+        #except FileNotFoundError as e:
+        #    print("[ERROR] Could not find this file: <" + filename + ">: " + e[0] + "\n" + str(e))
+        #    raise
+
+        #except Exception as e:
+        #    print("[ERROR] Failed to parse this file: <" + filename + ">: " + e[0] + "\n" + str(e))
+        #    raise
+
+        #except:
+        #    print("[ERROR] Couldn't parse this file: <" + filename + ">.")
+        #    raise
 
     #@profile
     def parse_lines(self, glines, follow=False):

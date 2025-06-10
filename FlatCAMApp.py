@@ -2060,7 +2060,10 @@ class App(QtCore.QObject):
             # Opening the file happens here
             self.progress.emit(30)
             try:
-                gerber_obj.parse_file(filename, follow=follow)
+                self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+                filepathandname = filename[len("('"):filename.find("', 'All Files (*)')")]
+                self.log.debug("Will try to open this file: <" + filepathandname + ">.")
+                gerber_obj.parse_file(filepathandname, follow=follow)
 
             except IOError:
                 app_obj.inform.emit("[error] Failed to open file: " + filename)

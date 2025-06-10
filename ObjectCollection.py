@@ -162,7 +162,7 @@ class ObjectCollection():
 
         # Create the model item to insert into the QListView
         icon = QtGui.QIcon(self.icons[obj.kind])#self.icons["gerber"])
-        item = QtWidgets.QStandardItem(icon, str(name))
+        item = QtGui.QStandardItem(icon, str(name))
         # Item is not editable, so that double click
         # does not allow cell value modification.
         item.setEditable(False)
@@ -293,7 +293,7 @@ class ObjectCollection():
         :return: None
         """
         iobj = self.model.createIndex(self.get_names().index(name), 0)  # Column 0
-        self.view.selectionModel().select(iobj, QtWidgets.QItemSelectionModel.Select)
+        self.view.selectionModel().select(iobj, QtCore.QItemSelectionModel.Select)
 
     def set_inactive(self, name):
         """
@@ -304,7 +304,7 @@ class ObjectCollection():
         :return: None
         """
         iobj = self.model.createIndex(self.get_names().index(name), 0)  # Column 0
-        self.view.selectionModel().select(iobj, QtWidgets.QItemSelectionModel.Deselect)
+        self.view.selectionModel().select(iobj, QtCore.QItemSelectionModel.Deselect)
 
     def set_all_inactive(self):
         """
