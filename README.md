@@ -13,6 +13,20 @@ Before starting this program for the first time on your computer, make sure you 
 
 To start this program run 'py flatcam' or 'python flatcam'.
 
+TODO:
+```
+[DEBUG][MainThread] on_generatecutout_button_click--> FlatCAMObj.read_form()
+[WARNING][MainThread] Failed to read option from field: use_buffer_for_union
+```
+
+TODO: After clicking on button to generate geometry:
+```
+[DEBUG][MainThread] FlatCAMGeometry.set_ui()
+[DEBUG][Dummy-38] A new object is available. Should plot it!
+[DEBUG][MainThread] plot --> FlatCAMObj.plot()
+[WARNING][MainThread] Did not plot:<class 'shapely.geometry.multilinestring.MultiLineString'>
+```
+
 TODO: This error happens sometimes while starting flatcam, but application doesn't seem to bug out, so this is a minor bug.
 ```
 C:\flatcam>py flatcam
