@@ -984,7 +984,14 @@ class App(QtCore.QObject):
         self.log.debug("   %s" % kind)
         self.log.debug("   %s" % filename)
 
-        record = {'kind': str(kind), 'filename': str(filename)}
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
+        record = {'kind': str(kind), 'filename': str(filepathandname)}
         if record in self.recent:
             return
 
@@ -1731,11 +1738,18 @@ class App(QtCore.QObject):
         # TODO: Improve the serialization methods and remove this fix.
         filename = str(filename)
 
-        if filename == "":
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
+        if filepathandname == "":
             self.inform.emit("Open cancelled.")
         else:
             self.worker_task.emit({'fcn': self.open_gerber,
-                                   'params': [filename]})
+                                   'params': [filepathandname]})
 
     def on_fileopenexcellon(self):
         """
@@ -1758,11 +1772,18 @@ class App(QtCore.QObject):
         # TODO: Improve the serialization methods and remove this fix.
         filename = str(filename)
 
-        if filename == "":
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
+        if filepathandname == "":
             self.inform.emit("Open cancelled.")
         else:
             self.worker_task.emit({'fcn': self.open_excellon,
-                                   'params': [filename]})
+                                   'params': [filepathandname]})
 
     def on_fileopengcode(self):
         """
@@ -1785,11 +1806,18 @@ class App(QtCore.QObject):
         # TODO: Improve the serialization methods and remove this fix.
         filename = str(filename)
 
-        if filename == "":
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
+        if filepathandname == "":
             self.inform.emit("Open cancelled.")
         else:
             self.worker_task.emit({'fcn': self.open_gcode,
-                                   'params': [filename]})
+                                   'params': [filepathandname]})
 
     def on_file_openproject(self):
         """
@@ -1812,14 +1840,21 @@ class App(QtCore.QObject):
         # TODO: Improve the serialization methods and remove this fix.
         filename = str(filename)
 
-        if filename == "":
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
+        if filepathandname == "":
             self.inform.emit("Open cancelled.")
         else:
             # self.worker_task.emit({'fcn': self.open_project,
-            #                        'params': [filename]})
+            #                        'params': [filepathandname]})
             # The above was failing because open_project() is not
             # thread safe. The new_project()
-            self.open_project(filename)
+            self.open_project(filepathandname)
 
     def on_file_exportsvg(self):
         """
@@ -1862,11 +1897,18 @@ class App(QtCore.QObject):
 
         filename = str(filename)
 
-        if filename == "":
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
+        if filepathandname == "":
             self.inform.emit("Export SVG cancelled.")
             return
         else:
-            self.export_svg(name, filename)
+            self.export_svg(name, filepathandname)
 
     def on_file_importsvg(self):
         """
@@ -1885,11 +1927,18 @@ class App(QtCore.QObject):
 
         filename = str(filename)
 
-        if filename == "":
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
+        if filepathandname == "":
             self.inform.emit("Open cancelled.")
         else:
             self.worker_task.emit({'fcn': self.import_svg,
-                                   'params': [filename]})
+                                   'params': [filepathandname]})
 
     def on_file_saveproject(self):
         """
@@ -1921,15 +1970,21 @@ class App(QtCore.QObject):
         self.report_usage("on_file_saveprojectas")
 
         try:
-            filename = QtWidgets.QFileDialog.getSaveFileName(caption="Save Project As ...",
-                                                         directory=self.get_last_folder())
+            filename = QtWidgets.QFileDialog.getSaveFileName(caption="Save Project As ...", directory=self.get_last_folder())
         except TypeError:
             filename = QtWidgets.QFileDialog.getSaveFileName(caption="Save Project As ...")
 
         filename = str(filename)
 
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
         try:
-            f = open(filename, 'r')
+            f = open(filepathandname, 'r')
             f.close()
             exists = True
         except IOError:
@@ -1945,11 +2000,11 @@ class App(QtCore.QObject):
             if result == QtWidgets.QMessageBox.Cancel:
                 return
 
-        self.save_project(filename)
-        self.file_opened.emit("project", filename)
+        self.save_project(filepathandname)
+        self.file_opened.emit("project", filepathandname)
 
         if not make_copy:
-            self.project_filename = filename
+            self.project_filename = filepathandname
             self.inform.emit("Project saved to: " + self.project_filename)
         else:
             self.inform.emit("Project copy saved to: " + self.project_filename)
@@ -1963,6 +2018,13 @@ class App(QtCore.QObject):
         """
 
         self.log.debug("export_svg()")
+
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
 
         try:
             obj = self.collection.get_by_name(str(obj_name))
@@ -1999,7 +2061,7 @@ class App(QtCore.QObject):
             # Parse the xml through a xml parser just to add line feeds
             # and to make it look more pretty for the output
             doc = parse_xml_string(svg_elem)
-            with open(filename, 'w') as fp:
+            with open(filepathandname, 'w') as fp:
                 fp.write(doc.toprettyxml())
 
     def import_svg(self, filename, outname=None):
@@ -2012,22 +2074,31 @@ class App(QtCore.QObject):
         :return:
         """
 
+        self.log.debug("import_svg()")
+
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
         def obj_init(geo_obj, app_obj):
 
-            geo_obj.import_svg(filename)
+            geo_obj.import_svg(filepathandname)
 
         with self.proc_container.new("Importing SVG") as proc:
 
             # Object name
-            name = outname or filename.split('/')[-1].split('\\')[-1]
+            name = outname or filepathandname.split('/')[-1].split('\\')[-1]
 
             self.new_object("geometry", name, obj_init)
 
             # Register recent file
-            self.file_opened.emit("svg", filename)
+            self.file_opened.emit("svg", filepathandname)
 
             # GUI feedback
-            self.inform.emit("Opened: " + filename)
+            self.inform.emit("Opened: " + filepathandname)
 
     def open_gerber(self, filename, follow=False, outname=None):
         """
@@ -2044,6 +2115,15 @@ class App(QtCore.QObject):
         :return: None
         """
 
+        App.log.debug("open_gerber()")
+
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
         # How the object should be initialized
         def obj_init(gerber_obj, app_obj):
 
@@ -2053,18 +2133,15 @@ class App(QtCore.QObject):
             # Opening the file happens here
             self.progress.emit(30)
             try:
-                self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
-                filepathandname = filename[len("('"):filename.find("', 'All Files (*)')")]
-                self.log.debug("Will try to open this file: <" + filepathandname + ">.")
                 gerber_obj.parse_file(filepathandname, follow=follow)
 
             except IOError:
-                app_obj.inform.emit("[error] Failed to open file: " + filename)
+                app_obj.inform.emit("[error] Failed to open file: " + filepathandname)
                 app_obj.progress.emit(0)
-                raise IOError('Failed to open file: ' + filename)
+                raise IOError('Failed to open file: ' + filepathandname)
 
             except ParseError as e:
-                app_obj.inform.emit("[error] Failed to parse file: " + filename + ". " + e[0])
+                app_obj.inform.emit("[error] Failed to parse file: " + filepathandname + ". " + e[0])
                 app_obj.progress.emit(0)
                 self.log.error(str(e))
                 raise
@@ -2076,33 +2153,31 @@ class App(QtCore.QObject):
                 raise
 
             if gerber_obj.is_empty():
-                app_obj.inform.emit("[error] No geometry found in file: " + filename)
+                app_obj.inform.emit("[error] No geometry found in file: " + filepathandname)
                 self.collection.set_active(gerber_obj.options["name"])
                 self.collection.delete_active()
 
             # Further parsing
             self.progress.emit(70)  # TODO: Note the mixture of self and app_obj used here
 
-        App.log.debug("open_gerber()")
-
         with self.proc_container.new("Opening Gerber") as proc:
 
             self.progress.emit(10)
 
             # Object name
-            name = outname or filename.split('/')[-1].split('\\')[-1]
+            name = outname or filepathandname.split('/')[-1].split('\\')[-1]
 
             ### Object creation ###
             self.new_object("gerber", name, obj_init)
 
             # Register recent file
-            self.file_opened.emit("gerber", filename)
+            self.file_opened.emit("gerber", filepathandname)
 
             self.progress.emit(100)
             #proc.done()
 
             # GUI feedback
-            self.inform.emit("Opened: " + filename)
+            self.inform.emit("Opened: " + filepathandname)
 
     def open_excellon(self, filename, outname=None):
         """
@@ -2118,6 +2193,13 @@ class App(QtCore.QObject):
 
         App.log.debug("open_excellon()")
 
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
         #self.progress.emit(10)
 
         # How the object should be initialized
@@ -2125,12 +2207,12 @@ class App(QtCore.QObject):
             #self.progress.emit(20)
 
             try:
-                excellon_obj.parse_file(filename)
+                excellon_obj.parse_file(filepathandname)
 
             except IOError:
-                app_obj.inform.emit("[error] Cannot open file: " + filename)
+                app_obj.inform.emit("[error] Cannot open file: " + filepathandname)
                 self.progress.emit(0)  # TODO: self and app_bjj mixed
-                raise IOError("Cannot open file: " + filename)
+                raise IOError("Cannot open file: " + filepathandname)
 
             except:
                 msg = "[error] An internal error has ocurred. See shell.\n"
@@ -2148,7 +2230,7 @@ class App(QtCore.QObject):
                 raise
 
             if excellon_obj.is_empty():
-                app_obj.inform.emit("[error] No geometry found in file: " + filename)
+                app_obj.inform.emit("[error] No geometry found in file: " + filepathandname)
                 self.collection.set_active(excellon_obj.options["name"])
                 self.collection.delete_active()
             #self.progress.emit(70)
@@ -2156,15 +2238,15 @@ class App(QtCore.QObject):
         with self.proc_container.new("Opening Excellon."):
 
             # Object name
-            name = outname or filename.split('/')[-1].split('\\')[-1]
+            name = outname or filepathandname.split('/')[-1].split('\\')[-1]
 
             self.new_object("excellon", name, obj_init)
 
             # Register recent file
-            self.file_opened.emit("excellon", filename)
+            self.file_opened.emit("excellon", filepathandname)
 
             # GUI feedback
-            self.inform.emit("Opened: " + filename)
+            self.inform.emit("Opened: " + filepathandname)
             #self.progress.emit(100)
 
     def open_gcode(self, filename, outname=None):
@@ -2180,6 +2262,13 @@ class App(QtCore.QObject):
         """
         App.log.debug("open_gcode()")
 
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
         # How the object should be initialized
         def obj_init(job_obj, app_obj_):
             """
@@ -2192,13 +2281,13 @@ class App(QtCore.QObject):
             self.progress.emit(10)
 
             try:
-                f = open(filename)
+                f = open(filepathandname)
                 gcode = f.read()
                 f.close()
             except IOError:
-                app_obj_.inform.emit("[error] Failed to open " + filename)
+                app_obj_.inform.emit("[error] Failed to open " + filepathandname)
                 self.progress.emit(0)
-                raise IOError("Failed to open " + filename)
+                raise IOError("Failed to open " + filepathandname)
 
             job_obj.gcode = gcode
 
@@ -2211,7 +2300,7 @@ class App(QtCore.QObject):
         with self.proc_container.new("Opening G-Code."):
 
             # Object name
-            name = outname or filename.split('/')[-1].split('\\')[-1]
+            name = outname or filepathandname.split('/')[-1].split('\\')[-1]
 
             # New object creation and file processing
             try:
@@ -2228,10 +2317,10 @@ class App(QtCore.QObject):
                 raise e
 
             # Register recent file
-            self.file_opened.emit("cncjob", filename)
+            self.file_opened.emit("cncjob", filepathandname)
 
             # GUI feedback
-            self.inform.emit("Opened: " + filename)
+            self.inform.emit("Opened: " + filepathandname)
             self.progress.emit(100)
 
     def open_project(self, filename):
@@ -2251,23 +2340,30 @@ class App(QtCore.QObject):
         """
         App.log.debug("Opening project: " + filename)
 
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
         ## Open and parse
         try:
-            f = open(filename, 'r')
+            f = open(filepathandname, 'r')
         except IOError:
-            App.log.error("Failed to open project file: %s" % filename)
-            self.inform.emit("[error] Failed to open project file: %s" % filename)
+            App.log.error("Failed to open project file: %s" % filepathandname)
+            self.inform.emit("[error] Failed to open project file: %s" % filepathandname)
             return
 
         try:
             d = json.load(f, object_hook=dict2obj)
         except:
-            App.log.error("Failed to parse project file: %s" % filename)
-            self.inform.emit("[error] Failed to parse project file: %s" % filename)
+            App.log.error("Failed to parse project file: %s" % filepathandname)
+            self.inform.emit("[error] Failed to parse project file: %s" % filepathandname)
             f.close()
             return
 
-        self.file_opened.emit("project", filename)
+        self.file_opened.emit("project", filepathandname)
 
         ## Clear the current project
         ## NOT THREAD SAFE ##
@@ -2275,7 +2371,7 @@ class App(QtCore.QObject):
 
         ##Project options
         self.options.update(d['options'])
-        self.project_filename = filename
+        self.project_filename = filepathandname
         #self.ui.units_label.setText("[" + self.options["units"] + "]")
         self.set_screen_units(self.options["units"])
 
@@ -2288,7 +2384,7 @@ class App(QtCore.QObject):
             self.new_object(obj['kind'], obj['options']['name'], obj_init, active=False, fit=False, plot=False)
 
         self.plot_all()
-        self.inform.emit("Project loaded from: " + filename)
+        self.inform.emit("Project loaded from: " + filepathandname)
         App.log.debug("Project loaded")
 
     def propagate_defaults(self):
@@ -4353,6 +4449,13 @@ class App(QtCore.QObject):
         """
         self.log.debug("save_project()")
 
+        # TODO improve the next 5 lines of code
+        filepathandname = filename
+        if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+            self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+            filepathandname = filename[len("('"):filename.find("', '")]
+            self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+
         ## Capture the latest changes
         # Current object
         try:
@@ -4370,9 +4473,9 @@ class App(QtCore.QObject):
 
         # Open file
         try:
-            f = open(filename, 'w')
+            f = open(filepathandname, 'w')
         except IOError:
-            App.log.error("[error] Failed to open file for saving: %s", filename)
+            App.log.error("[error] Failed to open file for saving: %s", filepathandname)
             return
 
         # Write
@@ -4381,13 +4484,13 @@ class App(QtCore.QObject):
         #     json.dump(d, f, default=to_dict)
         # except Exception, e:
         #     print str(e)
-        #     App.log.error("[error] File open but failed to write: %s", filename)
+        #     App.log.error("[error] File open but failed to write: %s", filepathandname)
         #     f.close()
         #     return
 
         f.close()
 
-        self.inform.emit("Project saved to: %s" % filename)
+        self.inform.emit("Project saved to: %s" % filepathandname)
 
 # def main():
 #

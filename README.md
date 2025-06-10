@@ -13,6 +13,8 @@ Before starting this program for the first time on your computer, make sure you 
 
 To start this program run 'py flatcam' or 'python flatcam'.
 
+If you are using Windows, you can use FlatCAM.bat.
+
 TODO:
 ```
 [DEBUG][MainThread] Radio toggled
@@ -62,19 +64,6 @@ Traceback (most recent call last):
     raise NotImplementedError(
 NotImplementedError: Sub-geometries may have coordinate sequences, but multi-part geometries do not
 ```
-```
-[DEBUG][MainThread] save_project()
-[DEBUG][MainThread] save_project--> FlatCAMObj.read_form()
-[ERROR][MainThread] [error] Failed to open file for saving: ('/mnt/EA56F2E856F2B483/flatcam/examples/gerber/gerber', 'All Files (*)')
-[DEBUG][MainThread] register_recent()
-[DEBUG][MainThread]    project
-[DEBUG][MainThread]    ('/mnt/EA56F2E856F2B483/flatcam/examples/gerber/gerber', 'All Files (*)')
-[DEBUG][MainThread] setup_recent_items()
-[DEBUG][MainThread] save_project()
-[DEBUG][MainThread] save_project--> FlatCAMObj.read_form()
-[ERROR][MainThread] [error] Failed to open file for saving: ('/mnt/EA56F2E856F2B483/flatcam/examples/gerber/gerber', 'All Files (*)')
-```
-
 
 TODO: After clicking on button to generate CNC:
 ```
@@ -109,7 +98,7 @@ Traceback (most recent call last):
 NotImplementedError: Sub-geometries may have coordinate sequences, but multi-part geometries do not
 ```
 
-TODO: This error happens sometimes while starting flatcam, but application doesn't seem to bug out, so this is a minor bug.
+TODO: This error happens sometimes while starting FlatCAM, but application doesn't seem to bug out, so this is a minor bug.
 ```
 C:\flatcam>py flatcam
 C:\flatcam\FlatCAMApp.py:789: SyntaxWarning: invalid escape sequence '\ '
@@ -137,7 +126,7 @@ C:\flatcam\ToolTransform.py:310: SyntaxWarning: "is" with 'str' literal. Did you
 [INFO][MainThread] FlatCAM Starting...
 ```
 
-TODO: This error happens sometimes while starting flatcam, and re-starting it usually solves it, so this is a minor bug:
+TODO: This error happens sometimes while starting flatcam, and re-starting FlatCAM usually solves this error, so this is a minor bug:
 ```
 Traceback (most recent call last):
   File "C:\flatcam\GUIElements.py", line 47, in on_toggle
@@ -145,35 +134,3 @@ Traceback (most recent call last):
        ^^^^^^^^^^^^^^^
 AttributeError: 'QThread' object has no attribute 'isChecked'
 ```
-
-TODO: Check if reading files other than Gerber also produces a similar error that existed when opening Gerber files and that was corrected on commit 2025/06/10 10h41m GMT+1:
-```
-Traceback (most recent call last):
-  File "C:\flatcam\FlatCAMApp.py", line 2063, in obj_init
-    gerber_obj.parse_file(filename, follow=follow)
-    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\flatcam\camlib.py", line 1824, in parse_file
-    with open(filename, 'r') as gfile:
-         ~~~~^^^^^^^^^^^^^^^
-OSError: [Errno 22] Invalid argument: "('C:/flatcam/examples/Gerber/example.gbr', 'All Files (*)')"
-During handling of the above exception, another exception occurred:
-Traceback (most recent call last):
-  File "C:\flatcam\FlatCAMWorker.py", line 62, in do_worker_task
-    raise e
-  File "C:\flatcam\FlatCAMWorker.py", line 59, in do_worker_task
-    task['fcn'](*task['params'])
-    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "C:\flatcam\FlatCAMApp.py", line 2100, in open_gerber
-    self.new_object("gerber", name, obj_init)
-    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\flatcam\FlatCAMApp.py", line 1081, in new_object
-    initialize(obj, self)
-    ~~~~~~~~~~^^^^^^^^^^^
-  File "C:\flatcam\FlatCAMApp.py", line 2068, in obj_init
-    raise IOError('Failed to open file: ' + filename)
-OSError: Failed to open file: ('C:/flatcam/examples/Gerber/example.gbr', 'All Files (*)')
-```
-
-TODO: Related with the previous bug, file name on the UI (and probably everywhere else) is ```example.gbr', 'All Files (*)')``` instead of beeing ```example.gbr```, but application doesn't seem to bug out, so this is a minor bug.
-
-TODO: Related with the previous bug, if file name and path is empty what happens?
