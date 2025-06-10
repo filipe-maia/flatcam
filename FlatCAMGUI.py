@@ -239,7 +239,7 @@ class FlatCAMGUI(QtWidgets.QMainWindow):
         # right_widget.setContentsMargins(0, 0, 0, 0)
         self.splitter.addWidget(right_widget)
         self.right_layout = QtWidgets.QVBoxLayout()
-        self.right_layout.setContentsMargins(0, 0, 0, 0)#self.right_layout.setMargin(0)
+        self.right_layout.setContentsMargins(0, 0, 0, 0)
         right_widget.setLayout(self.right_layout)
 
         ################
@@ -260,7 +260,7 @@ class FlatCAMGUI(QtWidgets.QMainWindow):
 
         self.units_label = QtWidgets.QLabel("[in]")
         # self.units_label.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
-        self.units_label.setContentsMargins(2, 2, 2, 2)#self.units_label.setMargin(2)
+        self.units_label.setContentsMargins(2, 2, 2, 2)
         infobar.addWidget(self.units_label)
 
         self.progress_bar = QtWidgets.QProgressBar()

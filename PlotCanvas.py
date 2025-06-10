@@ -162,7 +162,7 @@ class PlotCanvas(QtCore.QObject):
         self.cache = CanvasCache(self, self.app)
         self.cache_thread = QtCore.QThread()
         self.cache.moveToThread(self.cache_thread)
-        self.cache_thread.started.connect(self.cache.run)#super(PlotCanvas, self).connect(self.cache_thread, QtCore.SIGNAL("started()"), self.cache.run)
+        self.cache_thread.started.connect(self.cache.run)
         # self.connect()
         self.cache_thread.start()
         self.cache.new_screen.connect(self.on_new_screen)
