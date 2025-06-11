@@ -15,6 +15,9 @@ To start this program run 'py flatcam' or 'python flatcam'.
 
 If you are using Windows, you can use FlatCAM.bat.
 
+NOTE: To use FlatCAM in an O.S. different from win64, delete the three folders of Shapely inside FlatCAM folder, then download Shapely 1.8.5 for the target O.S. and place it inside FlatCAM folder.
+TODO: remove shapely 1.8.5_win64 from inside project folder and use the one installed by pip with the requirements.txt.
+
 TODO:
 ```
 [DEBUG][MainThread] Radio toggled
@@ -40,38 +43,33 @@ TODO:
 [DEBUG][Dummy-2] 0.241575 seconds executing initialize().
 ```
 
-TODO: After clicking on button to generate CNC:
+TODO: Warnings shown when using versions 1.8.x of shapely instead of versions 2.x:
+```
+[DEBUG][MainThread] plot --> FlatCAMObj.plot()
+C:\flatcam\9.0shapely2.1.1\FlatCAMObj.py:640: ShapelyDeprecationWarning: Iteration over multi-part geometries is deprecated and will be removed in Shapely 2.0. Use the `geoms` property to access the constituent parts of a multi-part geometry.
+  _ = iter(geometry)
+C:\flatcam\9.0shapely2.1.1\FlatCAMObj.py:650: ShapelyDeprecationWarning: Iteration over multi-part geometries is deprecated and will be removed in Shapely 2.0. Use the `geoms` property to access the constituent parts of a multi-part geometry.
+  for poly in geometry:
+C:\flatcam\9.0shapely2.1.1\descartes\patch.py:66: ShapelyDeprecationWarning: The array interface is deprecated and will no longer work in Shapely 2.0. Convert the '.coords' to a numpy array instead.
+  return PathPatch(PolygonPath(polygon), **kwargs)
+[DEBUG][Dummy-11] Canvas update requested: [0, 0, 0, 0, 0]
+```
+```
+[DEBUG][Dummy-19] 0.000382 seconds before initialize().
+[DEBUG] generate_from_geometry_2()
+C:\flatcam\9.0shapely2.1.1\camlib.py:325: ShapelyDeprecationWarning: Iteration over multi-part geometries is deprecated and will be removed in Shapely 2.0. Use the `geoms` property to access the constituent parts of a multi-part geometry.
+  for geo in geometry:
+[DEBUG] 41 paths
+```
+
+TODO: For example, after clicking on button to generate CNC (this is probably related with the TODO "if using shapely versions 2.x the green areas won't be drawn"):
 ```
 [DEBUG][MainThread] plot --> FlatCAMObj.plot()
 [WARNING][MainThread] A geometry component was not a polygon:
 [WARNING][MainThread] MULTIPOLYGON (((...)))
 ```
-and after clicking a second time:
-```
-[DEBUG][Dummy-2] FCVisibleProcessContainer.on_done()
-Traceback (most recent call last):
-  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMWorker.py", line 62, in do_worker_task
-    raise e
-  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMWorker.py", line 59, in do_worker_task
-    task['fcn'](*task['params'])
-  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMObj.py", line 1595, in job_thread
-    app_obj.new_object("cncjob", outname, job_init)
-  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMApp.py", line 1074, in new_object
-    initialize(obj, self)
-  File "/mnt/EA56F2E856F2B483/flatcam/FlatCAMObj.py", line 1581, in job_init
-    job_obj.generate_from_geometry_2(self,
-  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 3245, in generate_from_geometry_2
-    storage.insert(shape)
-  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 4353, in insert
-    super(FlatCAMRTreeStorage, self).insert(idx, obj)
-  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 4306, in insert
-    for pt in self.get_points(obj):
-  File "/mnt/EA56F2E856F2B483/flatcam/camlib.py", line 3235, in get_pts
-    return [o.coords[0], o.coords[-1]]
-  File "/home/v00efmem/.local/lib/python3.10/site-packages/shapely/geometry/base.py", line 1033, in coords
-    raise NotImplementedError(
-NotImplementedError: Sub-geometries may have coordinate sequences, but multi-part geometries do not
-```
+
+TODO: If using shapely versions 2.x the green areas won't be drawn. This is maybe related with the TODO "for example, after clicking on button to generate CNC".
 
 TODO: This error happens sometimes while starting FlatCAM, but application doesn't seem to bug out, so this is a minor bug.
 ```
@@ -84,7 +82,7 @@ C:\flatcam\FlatCAMObj.py:748: SyntaxWarning: "is not" with 'str' literal. Did yo
   if option is not 'name':
 C:\flatcam\camlib.py:1610: SyntaxWarning: invalid escape sequence '\+'
   '?(?=.*I([\+-]?\d+))?(?=.*J([\+-]?\d+))?[XYIJ][^D]*(?:D0([12]))?\*$')
-C:\flatcam\camlib.py:2318: SyntaxWarning: "is not" with 'str' literal. Did you mean "!="?
+C:\flatcam\camlib.py:2319: SyntaxWarning: "is not" with 'str' literal. Did you mean "!="?
   if self.apertures[current_aperture]["type"] is not "AM":
 C:\flatcam\svgparse.py:275: SyntaxWarning: invalid escape sequence '\{'
   kind = re.search('(?:\{.*\})?(.*)$', node.tag).group(1)

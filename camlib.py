@@ -1821,7 +1821,8 @@ class Gerber (Geometry):
         :return: None
         """
 
-        print("[DEBUG] Will try to parse this file: <" + filename + ">.")
+        log.debug("[DEBUG] Will try to parse this file: <" + filename + ">.")
+
         #try:
 
         with open(filename, 'r') as gfile:
@@ -2695,6 +2696,9 @@ class Excellon(Geometry):
         :type filename: str
         :return: None
         """
+
+        log.debug("[DEBUG] Will try to parse this file: <" + filename + ">.")
+
         efile = open(filename, 'r')
         estr = efile.readlines()
         efile.close()
@@ -3232,7 +3236,16 @@ class CNCjob(Geometry):
         ## Index first and last points in paths
         # What points to index.
         def get_pts(o):
-            return [o.coords[0], o.coords[-1]]
+            # Comment the following line if shapely's version is < 1.8.x.
+            log.info("Type of o on camlib get_pts: " + str(type(o))) # It's a shapely.geometry.multipolygon.MultiPolygon in shapely 2.x and it's a shapely.geometry.polygon.LinearRing in shapely 1.8.x.
+            # Comment the following five lines if shapely's version is < 2.x.
+            #log.info("Type of o.geoms on camlib get_pts: " + str(type(o.geoms))) # shapely.geometry.base.GeometrySequence
+            #log.info("Type of o.geoms[0] on camlib get_pts: " + str(type(o.geoms[0]))) # shapely.geometry.polygon.Polygon
+            #log.info("Type of o.geoms[-1] on camlib get_pts: " + str(type(o.geoms[-1]))) # shapely.geometry.polygon.Polygon
+            #log.info("Type of o.geoms[0].coords: " + str(type(o.geoms[0].coords))) # NotImplementedError: Component rings have coordinate sequences, but the polygon does not
+            #log.info("Type of o.geoms[-1].coords: " + str(type(o.geoms[-1].coords))) # NotImplementedError: Component rings have coordinate sequences, but the polygon does not
+            #return [o.geoms[0].coords, o.geoms[-1].coords] # Use this line instead of the next line if shapely's version is >= 2.x.
+            return [o.coords[0], o.coords[-1]] # Use this line instead of the previous line if shapely's version is < 2.x.
 
         # Create the indexed storage.
         storage = FlatCAMRTreeStorage()
@@ -4347,6 +4360,7 @@ class FlatCAMRTreeStorage(FlatCAMRTree):
         # but it's important to remember that shapely geometry is
         # mutable, ie. it can be modified to a totally different shape
         # and continue to have the same id.
+        # P.S. shapely geometry is not mutable if version >= 2.
         # self.indexes[obj] = idx
         self.indexes[id(obj)] = idx
 

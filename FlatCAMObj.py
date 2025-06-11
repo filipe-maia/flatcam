@@ -541,8 +541,8 @@ class FlatCAMGerber(FlatCAMObj, Gerber):
             if invert:
                 if type(geom) is MultiPolygon:
                     pl = []
-                    for p in geom.geoms: # Use this line instead of the next line if shapely's version is >=2.
-                    #for p in geom: # Use this line instead of the previous line if shapely's version is <2.
+                    for p in geom.geoms: # Use this line instead of the next line if shapely's version is >= 1.8.x.
+                    #for p in geom: # Use this line instead of the previous line if shapely's version is < 2.x.
                         pl.append(Polygon(p.exterior.coords[::-1], p.interiors))
                     geom = MultiPolygon(pl)
                 elif type(geom) is Polygon:
@@ -1665,6 +1665,7 @@ class FlatCAMGeometry(FlatCAMObj, Geometry):
     def plot_element(self, element):
         try:
 
+            # Comment the following four lines if shapely's version is < 1.8.x.
             if str(type(element)) == "<class 'shapely.geometry.multilinestring.MultiLineString'>" or str(type(element)) == "<class 'shapely.geometry.multipolygon.MultiPolygon'>":
                 for sub_el in element.geoms:
                     self.plot_element(sub_el)

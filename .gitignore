@@ -1,3 +1,65 @@
 *.pyc
 .idea/
 tests/tmp/
+
+
+# SVN
+/.svn
+
+# Logs
+*.log
+
+# Linux/Unix temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# Linux trash folder
+.Trash-*
+
+# KDE directory preferences
+.directory
+
+# NFS files
+.nfs*
+
+# Windows shortcuts
+*.lnk
+
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+
+# Windows folder config file
+Desktop.ini
+
+# Windows recycle bin
+$RECYCLE.BIN/
+
+# Apple files (Icon ends with two \r, that's the reason for using 'Icon?')
+Icon?
+!Icons
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Apple files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Apple directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Apple thumbnails
+._*
+
+# Amazon Web Services
+.elasticbeanstalk
