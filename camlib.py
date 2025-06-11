@@ -3244,7 +3244,7 @@ class CNCjob(Geometry):
             #log.info("Type of o.geoms[-1] on camlib get_pts: " + str(type(o.geoms[-1]))) # shapely.geometry.polygon.Polygon
             #log.info("Type of o.geoms[0].coords: " + str(type(o.geoms[0].coords))) # NotImplementedError: Component rings have coordinate sequences, but the polygon does not
             #log.info("Type of o.geoms[-1].coords: " + str(type(o.geoms[-1].coords))) # NotImplementedError: Component rings have coordinate sequences, but the polygon does not
-            #return [o.geoms[0].coords, o.geoms[-1].coords] # Use this line instead of the next line if shapely's version is >= 2.x.
+            #return [o.geoms[0].coords, o.geoms[-1].coords] # TODO THIS LINE THROWS AN EXCEPTION... Use this line instead of the next line if shapely's version is >= 2.x.
             return [o.coords[0], o.coords[-1]] # Use this line instead of the previous line if shapely's version is < 2.x.
 
         # Create the indexed storage.

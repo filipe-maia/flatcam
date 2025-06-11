@@ -818,9 +818,9 @@ class FlatCAMExcellon(FlatCAMObj, Excellon):
         self.ui.tools_table.resizeColumnsToContents()
         self.ui.tools_table.resizeRowsToContents()
         horizontal_header = self.ui.tools_table.horizontalHeader()
-        horizontal_header.setResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-        horizontal_header.setResizeMode(1, QtWidgets.QHeaderView.Stretch)
-        horizontal_header.setResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
+        horizontal_header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+        horizontal_header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        horizontal_header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
         # horizontal_header.setStretchLastSection(True)
         self.ui.tools_table.verticalHeader().hide()
         self.ui.tools_table.setSortingEnabled(True)
@@ -1112,22 +1112,42 @@ class FlatCAMCNCjob(FlatCAMObj, CNCjob):
         self.read_form()
         self.plot()
 
+    # TODO this function is exactly the same as the one in FlatCAMApp.py (except the log is not self.log), only one of them should exist.
+    # Example of a filename received and of a filepathandname returned:
+    #     "('\home\user\file.example', 'All Files (*)')"
+    #     "\home\user\file.example"
+    # Another example:
+    #     "('C:\Users\user\file.example', 'All Files (*)')"
+    #     "C:\Users\user\file.example"
+    # TODO improve this function
+    def extract_file_name_with_path(self, filename):
+        filepathandname = filename
+        try:
+            if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+                log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+                filepathandname = filename[len("('"):filename.find("', '")]
+                log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        except NoneType:
+            return filename
+        return filepathandname
+
     def on_exportgcode_button_click(self, *args):
         self.app.report_usage("cncjob_on_exportgcode_button")
 
         self.read_form()
 
         try:
-            filename = str(QtWidgets.QFileDialog.getSaveFileName(caption="Export G-Code ...",
-                                                         directory=self.app.defaults["last_folder"]))
+            filename = str(QtWidgets.QFileDialog.getSaveFileName(caption="Export G-Code ...", directory=self.app.defaults["last_folder"]))
         except TypeError:
             filename = str(QtWidgets.QFileDialog.getSaveFileName(caption="Export G-Code ..."))
+
+        filepathandname = self.extract_file_name_with_path(filename)
 
         preamble = str(self.ui.prepend_text.get_value())
         postamble = str(self.ui.append_text.get_value())
         processor = str(self.ui.process_script.get_value())
 
-        self.export_gcode(filename, preamble=preamble, postamble=postamble, processor=processor)
+        self.export_gcode(filepathandname, preamble=preamble, postamble=postamble, processor=processor)
 
     def dwell_generator(self, lines):
         """
@@ -1161,7 +1181,7 @@ class FlatCAMCNCjob(FlatCAMObj, CNCjob):
 
             yield line
 
-        raise StopIteration
+        # Why was the code 'raise StopIteration' here?!
 
     def export_gcode(self, filename, preamble='', postamble='', processor=''):
 
@@ -1173,8 +1193,10 @@ class FlatCAMCNCjob(FlatCAMObj, CNCjob):
             log.debug("Will add G04!")
             lines = self.dwell_generator(lines)
 
+        filepathandname = self.extract_file_name_with_path(filename)
+
         ## Write
-        with open(filename, 'w') as f:
+        with open(filepathandname, 'w') as f:
             f.write(preamble + "\n")
 
             for line in lines:
@@ -1184,9 +1206,9 @@ class FlatCAMCNCjob(FlatCAMObj, CNCjob):
             f.write(postamble)
 
         # Just for adding it to the recent files list.
-        self.app.file_opened.emit("cncjob", filename)
+        self.app.file_opened.emit("cncjob", filepathandname)
 
-        self.app.inform.emit("Saved to: " + filename)
+        self.app.inform.emit("Saved to: " + filepathandname)
 
     def get_gcode(self, preamble='', postamble=''):
         #we need this to beable get_gcode separatelly for shell command export_code

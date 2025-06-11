@@ -44,7 +44,9 @@ class RadioSet(QtWidgets.QWidget):
     def on_toggle(self):
         log.debug("Radio toggled")
         radio = self.sender()
+        log.info("Radio type: " + str(type(element)))
         if radio.isChecked():
+            log.info("Radio is checked.")
             self.group_toggle_fn()
         return
 

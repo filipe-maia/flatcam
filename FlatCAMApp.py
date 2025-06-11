@@ -978,6 +978,7 @@ class App(QtCore.QObject):
         dlg.setText(message)
         dlg.exec_()
 
+    # TODO this function is exactly the same as the one in FlatCAMObj.py (except the self.log is not log), only one of them should exist.
     # Example of a filename received and of a filepathandname returned:
     #     "('\home\user\file.example', 'All Files (*)')"
     #     "\home\user\file.example"
@@ -2408,6 +2409,8 @@ class App(QtCore.QObject):
         self.worker_task.emit({'fcn': worker_task, 'params': [self]})
 
     def register_folder(self, filename):
+        self.log.debug("register_folder")
+        filepathandname = self.extract_file_name_with_path(filename)
         self.defaults["last_folder"] = os.path.split(str(filename))[0]
 
     def set_progress_bar(self, percentage, text=""):

@@ -32,6 +32,16 @@ TODO:
 [WARNING][MainThread] Failed to read option from field: use_buffer_for_union
 ```
 ```
+[DEBUG][MainThread] build_ui--> FlatCAMObj.to_form()
+[WARNING][MainThread] Tried to set an option or field that does not exist: coordinate_format
+[DEBUG][MainThread] on_zoom_fit--> OC.get_bounds()
+```
+```
+[DEBUG][MainThread] on_exportgcode_button_click--> FlatCAMObj.read_form()
+[WARNING][MainThread] Failed to read option from field: coordinate_format
+[DEBUG] Will add G04!
+```
+```
 ...
 [DEBUG] {'type': 'C', 'size': 2.286}
 [DEBUG] Line 608: Aperture change to (29)
@@ -102,7 +112,7 @@ C:\flatcam\ToolTransform.py:310: SyntaxWarning: "is" with 'str' literal. Did you
 TODO: This error happens sometimes while starting flatcam, and re-starting FlatCAM usually solves this error, so this is a minor bug:
 ```
 Traceback (most recent call last):
-  File "C:\flatcam\GUIElements.py", line 47, in on_toggle
+  File "C:\flatcam\GUIElements.py", line 48, in on_toggle
     if radio.isChecked():
        ^^^^^^^^^^^^^^^
 AttributeError: 'QThread' object has no attribute 'isChecked'
