@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtCore
 from copy import copy
-# import FlatCAMApp
+#import FlatCAMApp
 import re
 import logging
 
@@ -44,7 +44,9 @@ class RadioSet(QtWidgets.QWidget):
     def on_toggle(self):
         log.debug("Radio toggled")
         radio = self.sender()
+        log.info("Radio type: " + str(type(radio)))
         if radio.isChecked():
+            log.info("Radio is checked.")
             self.group_toggle_fn()
         return
 
@@ -114,7 +116,7 @@ class LengthEntry(QtWidgets.QLineEdit):
         except KeyError:
             value = raw
             return float(eval(value))
-        except Exception:
+        except:
             log.warning("Could not parse value in entry: %s" % str(raw))
             return None
 
@@ -151,7 +153,7 @@ class FloatEntry(QtWidgets.QLineEdit):
         raw = str(self.text()).strip(' ')
         try:
             evaled = eval(raw)
-        except Exception:
+        except:
             log.error("Could not evaluate: %s" % str(raw))
             return None
 
@@ -253,7 +255,7 @@ class EvalEntry(QtWidgets.QLineEdit):
         raw = str(self.text()).strip(' ')
         try:
             return eval(raw)
-        except Exception:
+        except:
             log.error("Could not evaluate: %s" % str(raw))
             return None
 
@@ -284,7 +286,6 @@ class FCTextArea(QtWidgets.QPlainTextEdit):
 
     def get_value(self):
         return str(self.toPlainText())
-
 
 class FCInputDialog(QtWidgets.QInputDialog):
     def __init__(self, parent=None, ok=False, val=None):

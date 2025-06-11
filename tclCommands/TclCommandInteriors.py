@@ -1,5 +1,4 @@
 from tclCommands.TclCommand import *
-from camlib import Geometry
 
 
 class TclCommandInteriors(TclCommandSignaled):

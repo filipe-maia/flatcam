@@ -1,27 +1,28 @@
 from PyQt5 import QtWidgets
 from GUIElements import RadioSet, EvalEntry, LengthEntry
 from FlatCAMTool import FlatCAMTool
-# from FlatCAMObj import FlatCAMGerber, FlatCAMExcellon
+#from FlatCAMObj import FlatCAMGerber, FlatCAMExcellon
 from FlatCAMObj import *
 from shapely.geometry import Point
 from shapely import affinity
 
 
 class DblSidedTool(FlatCAMTool):
+
     toolName = "Double-Sided PCB Tool"
 
     def __init__(self, app):
         FlatCAMTool.__init__(self, app)
 
-        # # Title
+        ## Title
         title_label = QtWidgets.QLabel("<font size=4><b>%s</b></font>" % self.toolName)
         self.layout.addWidget(title_label)
 
-        # # Form Layout
+        ## Form Layout
         form_layout = QtWidgets.QFormLayout()
         self.layout.addLayout(form_layout)
 
-        # # Layer to mirror
+        ## Layer to mirror
         self.object_combo = QtWidgets.QComboBox()
         self.object_combo.setModel(self.app.collection.model)
         self.botlay_label = QtWidgets.QLabel("Bottom Layer:")
@@ -31,7 +32,7 @@ class DblSidedTool(FlatCAMTool):
         # form_layout.addRow("Bottom Layer:", self.object_combo)
         form_layout.addRow(self.botlay_label, self.object_combo)
 
-        # # Axis
+        ## Axis
         self.mirror_axis = RadioSet([{'label': 'X', 'value': 'X'},
                                      {'label': 'Y', 'value': 'Y'}])
         self.mirax_label = QtWidgets.QLabel("Mirror Axis:")
@@ -41,7 +42,7 @@ class DblSidedTool(FlatCAMTool):
         # form_layout.addRow("Mirror Axis:", self.mirror_axis)
         form_layout.addRow(self.mirax_label, self.mirror_axis)
 
-        # # Axis Location
+        ## Axis Location
         self.axis_location = RadioSet([{'label': 'Point', 'value': 'point'},
                                        {'label': 'Box', 'value': 'box'}])
         self.axloc_label = QtWidgets.QLabel("Axis Location:")
@@ -53,7 +54,7 @@ class DblSidedTool(FlatCAMTool):
         # form_layout.addRow("Axis Location:", self.axis_location)
         form_layout.addRow(self.axloc_label, self.axis_location)
 
-        # # Point/Box
+        ## Point/Box
         self.point_box_container = QtWidgets.QVBoxLayout()
         self.pb_label = QtWidgets.QLabel("Point/Box:")
         self.pb_label.setToolTip(
@@ -71,7 +72,7 @@ class DblSidedTool(FlatCAMTool):
         self.point_box_container.addWidget(self.box_combo)
         self.box_combo.hide()
 
-        # # Alignment holes
+        ## Alignment holes
         self.alignment_holes = EvalEntry()
         self.ah_label = QtWidgets.QLabel("Alignment Holes:")
         self.ah_label.setToolTip(
@@ -80,7 +81,7 @@ class DblSidedTool(FlatCAMTool):
         )
         form_layout.addRow(self.ah_label, self.alignment_holes)
 
-        # # Drill diameter for alignment holes
+        ## Drill diameter for alignment holes
         self.drill_dia = LengthEntry()
         self.dd_label = QtWidgets.QLabel("Drill diam.:")
         self.dd_label.setToolTip(
@@ -89,7 +90,7 @@ class DblSidedTool(FlatCAMTool):
         )
         form_layout.addRow(self.dd_label, self.drill_dia)
 
-        # # Buttons
+        ## Buttons
         hlay = QtWidgets.QHBoxLayout()
         self.layout.addLayout(hlay)
         hlay.addStretch()
@@ -110,13 +111,13 @@ class DblSidedTool(FlatCAMTool):
 
         self.layout.addStretch()
 
-        # # Signals
+        ## Signals
         self.create_alignment_hole_button.clicked.connect(self.on_create_alignment_holes)
         self.mirror_object_button.clicked.connect(self.on_mirror)
 
         self.axis_location.group_toggle_fn = self.on_toggle_pointbox
 
-        # # Initialize form
+        ## Initialize form
         self.mirror_axis.set_value('X')
         self.axis_location.set_value('point')
 

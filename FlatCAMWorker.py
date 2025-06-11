@@ -1,10 +1,10 @@
-# ###########################################################
+############################################################
 # FlatCAM: 2D Post-processing for Manufacturing            #
 # http://flatcam.org                                       #
 # Author: Juan Pablo Caram (c)                             #
 # Date: 2/5/2014                                           #
 # MIT Licence                                              #
-# ###########################################################
+############################################################
 
 from PyQt5 import QtCore
 
@@ -52,14 +52,13 @@ class Worker(QtCore.QObject):
 
         self.allow_debug()
 
-        if ('worker_name' in task and task['worker_name'] == self.name) or \
-                ('worker_name' not in task and self.name is None):
+        if ('worker_name' in task and task['worker_name'] == self.name) or ('worker_name' not in task and self.name is None):
 
             try:
                 task['fcn'](*task['params'])
             except Exception as e:
                 self.app.thread_exception.emit(e)
-                return e
+                raise e
 
             return
 

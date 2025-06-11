@@ -1,14 +1,12 @@
-# ###########################################################
+############################################################
 # FlatCAM: 2D Post-processing for Manufacturing            #
 # http://caram.cl/software/flatcam                         #
 # Author: Juan Pablo Caram (c)                             #
 # Date: 2/5/2014                                           #
 # MIT Licence                                              #
-# ###########################################################
+############################################################
 
-from PyQt5 import QtCore
-import FlatCAMApp
-import logging
+from PyQt5 import QtWidgets, QtCore
 
 # Prevent conflict with Qt5 and above.
 from matplotlib import use as mpl_use
@@ -18,6 +16,8 @@ mpl_use("Qt5Agg")
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_agg import FigureCanvasAgg
+import FlatCAMApp
+import logging
 
 log = logging.getLogger('base')
 
@@ -44,6 +44,7 @@ class CanvasCache(QtCore.QObject):
     new_screen = QtCore.pyqtSignal()
 
     def __init__(self, plotcanvas, app, dpi=50):
+
         super(CanvasCache, self).__init__()
 
         self.app = app
@@ -63,6 +64,7 @@ class CanvasCache(QtCore.QObject):
         self.cache = None
 
     def run(self):
+
         log.debug("CanvasCache Thread Started!")
 
         self.plotcanvas.update_screen_request.connect(self.on_update_req)
@@ -76,14 +78,14 @@ class CanvasCache(QtCore.QObject):
         :param extents: [xmin, xmax, ymin, ymax, zoom(optional)]
         """
 
-        # log.debug("Canvas update requested: %s" % str(extents))
+        log.debug("Canvas update requested: %s" % str(extents))
 
         # Note: This information below might be out of date. Establish
         # a protocol regarding when to change the canvas in the main
         # thread and when to check these values here in the background,
         # or pass this data in the signal (safer).
-        # log.debug("Size: %s [px]" % str(self.plotcanvas.get_axes_pixelsize()))
-        # log.debug("Density: %s [units/px]" % str(self.plotcanvas.get_density()))
+        log.debug("Size: %s [px]" % str(self.plotcanvas.get_axes_pixelsize()))
+        log.debug("Density: %s [units/px]" % str(self.plotcanvas.get_density()))
 
         # Move the requested screen portion to the main thread
         # and inform about the update:
@@ -93,6 +95,7 @@ class CanvasCache(QtCore.QObject):
         # Continue to update the cache.
 
     def on_new_object_available(self):
+
         log.debug("A new object is available. Should plot it!")
 
 
@@ -144,23 +147,22 @@ class PlotCanvas(QtCore.QObject):
         # self.canvas.setFocusPolicy(QtCore.Qt.ClickFocus)
         # self.canvas.setFocus()
 
-        # self.canvas.set_hexpand(1)
-        # self.canvas.set_vexpand(1)
-        # self.canvas.set_can_focus(True)  # For key press
+        #self.canvas.set_hexpand(1)
+        #self.canvas.set_vexpand(1)
+        #self.canvas.set_can_focus(True)  # For key press
 
         # Attach to parent
-        # self.container.attach(self.canvas, 0, 0, 600, 400)  # TODO: Height and width are num. columns??
+        #self.container.attach(self.canvas, 0, 0, 600, 400)  # TODO: Height and width are num. columns??
         self.container.addWidget(self.canvas)  # Qt
 
         # Copy a bitmap of the canvas for quick animation.
         # Update every time the canvas is re-drawn.
         self.background = self.canvas.copy_from_bbox(self.axes.bbox)
 
-        # ## Bitmap Cache
+        ### Bitmap Cache
         self.cache = CanvasCache(self, self.app)
         self.cache_thread = QtCore.QThread()
         self.cache.moveToThread(self.cache_thread)
-        # super(PlotCanvas, self).connect(self.cache_thread, QtCore.SIGNAL("started()"), self.cache.run)
         self.cache_thread.started.connect(self.cache.run)
         # self.connect()
         self.cache_thread.start()
@@ -170,10 +172,10 @@ class PlotCanvas(QtCore.QObject):
         self.canvas.mpl_connect('button_press_event', self.on_mouse_press)
         self.canvas.mpl_connect('button_release_event', self.on_mouse_release)
         self.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
-        # self.canvas.connect('configure-event', self.auto_adjust_axes)
+        #self.canvas.connect('configure-event', self.auto_adjust_axes)
         self.canvas.mpl_connect('resize_event', self.auto_adjust_axes)
-        # self.canvas.add_events(Gdk.EventMask.SMOOTH_SCROLL_MASK)
-        # self.canvas.connect("scroll-event", self.on_scroll)
+        #self.canvas.add_events(Gdk.EventMask.SMOOTH_SCROLL_MASK)
+        #self.canvas.connect("scroll-event", self.on_scroll)
         self.canvas.mpl_connect('scroll_event', self.on_scroll)
         self.canvas.mpl_connect('key_press_event', self.on_key_down)
         self.canvas.mpl_connect('key_release_event', self.on_key_up)
@@ -187,8 +189,7 @@ class PlotCanvas(QtCore.QObject):
 
     def on_new_screen(self):
 
-        # log.debug("Cache updated the screen!")
-        pass
+        log.debug("Cache updated the screen!")
 
     def on_key_down(self, event):
         """
@@ -319,7 +320,7 @@ class PlotCanvas(QtCore.QObject):
         # Sync re-draw to proper paint on form resize
         self.canvas.draw()
 
-        # #### Temporary place-holder for cached update #####
+        ##### Temporary place-holder for cached update #####
         self.update_screen_request.emit([0, 0, 0, 0, 0])
 
     def auto_adjust_axes(self, *args):
@@ -374,7 +375,7 @@ class PlotCanvas(QtCore.QObject):
         # Async re-draw
         self.canvas.draw_idle()
 
-        # #### Temporary place-holder for cached update #####
+        ##### Temporary place-holder for cached update #####
         self.update_screen_request.emit([0, 0, 0, 0, 0])
 
     def pan(self, x, y):
@@ -391,7 +392,7 @@ class PlotCanvas(QtCore.QObject):
         # Re-draw
         self.canvas.draw_idle()
 
-        # #### Temporary place-holder for cached update #####
+        ##### Temporary place-holder for cached update #####
         self.update_screen_request.emit([0, 0, 0, 0, 0])
 
     def new_axes(self, name):
@@ -458,8 +459,7 @@ class PlotCanvas(QtCore.QObject):
                     self.pan_axes.append(a)
 
             # Set pan view flag
-            if len(self.pan_axes) > 0:
-                self.panning = True
+            if len(self.pan_axes) > 0: self.panning = True;
 
     def on_mouse_release(self, event):
 
@@ -488,7 +488,7 @@ class PlotCanvas(QtCore.QObject):
             # Async re-draw (redraws only on thread idle state, uses timer on backend)
             self.canvas.draw_idle()
 
-            # #### Temporary place-holder for cached update #####
+            ##### Temporary place-holder for cached update #####
             self.update_screen_request.emit([0, 0, 0, 0, 0])
 
     def on_draw(self, renderer):

@@ -9,6 +9,7 @@ from FlatCAMObj import FlatCAMGerber, FlatCAMExcellon, FlatCAMGeometry, FlatCAMC
 
 
 class TclCommand(object):
+
     # FlatCAMApp
     app = None
 
@@ -51,10 +52,10 @@ class TclCommand(object):
         self.app = app
 
         if self.app is None:
-            return
+            raise TypeError('Expected app to be FlatCAMApp instance.')
 
         if not isinstance(self.app, FlatCAMApp.App):
-            return
+            raise TypeError('Expected FlatCAMApp, got %s.' % type(app))
 
         self.log = self.app.log
 
@@ -115,7 +116,7 @@ class TclCommand(object):
             if help_key in self.arg_names:
                 arg_type = self.arg_names[help_key]
                 type_name = str(arg_type.__name__)
-                # in_command_name = help_key + "<" + type_name + ">"
+                #in_command_name = help_key + "<" + type_name + ">"
                 in_command_name = help_key
 
             elif help_key in self.option_types:
@@ -162,15 +163,15 @@ class TclCommand(object):
     @staticmethod
     def parse_arguments(args):
         """
-            Pre-processes arguments to detect '-keyword value' pairs into dictionary
-            and standalone parameters into list.
+        Pre-processes arguments to detect '-keyword value' pairs into dictionary
+        and standalone parameters into list.
 
-            This is copy from FlatCAMApp.setup_shell().h() just for accessibility,
-            original should  be removed  after all commands will be converted
+        This is copy from FlatCAMApp.setup_shell().h() just for accessibility,
+        original should  be removed  after all commands will be converted
 
-            :param args: arguments from tcl to parse
-            :return: arguments, options
-            """
+        :param args: arguments from tcl to parse
+        :return: arguments, options
+        """
 
         options = {}
         arguments = []
@@ -248,7 +249,7 @@ class TclCommand(object):
         :return:
         """
 
-        return unknown_exception
+        raise unknown_exception
 
     def execute_wrapper(self, *args):
         """
@@ -260,7 +261,7 @@ class TclCommand(object):
         :return: None, output text or exception
         """
 
-        # self.worker_task.emit({'fcn': self.exec_command_test, 'params': [text, False]})
+        #self.worker_task.emit({'fcn': self.exec_command_test, 'params': [text, False]})
 
         try:
             self.log.debug("TCL command '%s' executed." % str(self.__class__))
@@ -285,7 +286,7 @@ class TclCommand(object):
         :return: None, output text or exception
         """
 
-        return "Please Implement this method"
+        raise NotImplementedError("Please Implement this method")
 
 
 class TclCommandSignaled(TclCommand):
@@ -305,7 +306,7 @@ class TclCommandSignaled(TclCommand):
 
     @abc.abstractmethod
     def execute(self, args, unnamed_args):
-        return ("Please Implement this method")
+        raise NotImplementedError("Please Implement this method")
 
     output = None
 
@@ -358,7 +359,6 @@ class TclCommandSignaled(TclCommand):
             def except_hook(type_, value, traceback_):
                 ex.append(value)
                 oeh(type_, value, traceback_)
-
             sys.excepthook = except_hook
 
             # Terminate on timeout
@@ -371,7 +371,7 @@ class TclCommandSignaled(TclCommand):
             # Restore exception management
             sys.excepthook = oeh
             if ex:
-                return 'fail'
+                raise ex[0]
 
             if status['timed_out']:
                 self.app.raise_tcl_unknown_error("Operation timed outed! Consider increasing option "

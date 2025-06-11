@@ -1,11 +1,11 @@
-# ###########################################################
+############################################################
 # FlatCAM: 2D Post-processing for Manufacturing            #
 # http://flatcam.org                                       #
 # Author: Damian Wrobel <dwrobel@ertelnet.rybnik.pl>       #
 # Date: 05/23/2017                                         #
 # MIT Licence                                              #
 # A setuptools based setup module                          #
-# ###########################################################
+############################################################
 
 from setuptools import setup
 import glob
@@ -13,7 +13,7 @@ import glob
 setup(
     name='FlatCAM',
 
-    version='8.5',
+    version='9.0',
 
     description='2D Computer-Aided PCB Manufacturing',
 

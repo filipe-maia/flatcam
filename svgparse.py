@@ -1,4 +1,4 @@
-# ###########################################################
+############################################################
 # FlatCAM: 2D Post-processing for Manufacturing            #
 # http://flatcam.org                                       #
 # Author: Juan Pablo Caram (c)                             #
@@ -17,7 +17,7 @@
 #  * All transformations                                   #
 #                                                          #
 #  Reference: www.w3.org/TR/SVG/Overview.html              #
-# ###########################################################
+############################################################
 
 import xml.etree.ElementTree as ET
 import re
@@ -50,7 +50,7 @@ def svgparselength(lengthstr):
     if match:
         return float(match.group(1)), match.group(2)
 
-    return ('Cannot parse SVG length: %s' % lengthstr)
+    raise Exception('Cannot parse SVG length: %s' % lengthstr)
 
 
 def path2shapely(path, res=1.0):
@@ -80,9 +80,7 @@ def path2shapely(path, res=1.0):
             continue
 
         # Arc, CubicBezier or QuadraticBezier
-        if isinstance(component, Arc) or \
-                isinstance(component, CubicBezier) or \
-                isinstance(component, QuadraticBezier):
+        if isinstance(component, Arc) or isinstance(component, CubicBezier) or isinstance(component, QuadraticBezier):
 
             # How many points to use in the dicrete representation.
             length = component.length(res / 10.0)
@@ -249,6 +247,7 @@ def svgline2shapely(line):
 
 
 def svgpolyline2shapely(polyline):
+
     ptliststr = polyline.get('points')
     points = parse_svg_point_list(ptliststr)
 
@@ -256,6 +255,7 @@ def svgpolyline2shapely(polyline):
 
 
 def svgpolygon2shapely(polygon):
+
     ptliststr = polygon.get('points')
     points = parse_svg_point_list(ptliststr)
 
@@ -329,7 +329,7 @@ def getsvggeo(node):
         if 'transform' in node.attrib:
             trstr = node.get('transform')
             trlist = parse_svg_transform(trstr)
-            # log.debug(trlist)
+            #log.debug(trlist)
 
             # Transformations are applied in reverse order
             for tr in trlist[::-1]:
@@ -347,7 +347,7 @@ def getsvggeo(node):
                 elif tr[0] == 'matrix':
                     geo = [affine_transform(geoi, tr[1:]) for geoi in geo]
                 else:
-                    return ('Unknown transformation: %s', tr)
+                    raise Exception('Unknown transformation: %s', tr)
 
     return geo
 
@@ -512,7 +512,7 @@ def parse_svg_transform(trstr):
             trstr = trstr[len(match.group(0)):].strip(' ')
             continue
 
-        return ("Don't know how to parse: %s" % trstr)
+        raise Exception("Don't know how to parse: %s" % trstr)
 
     return trlist
 

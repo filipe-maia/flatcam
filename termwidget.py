@@ -81,7 +81,6 @@ class _ExpandableTextEdit(QTextEdit):
         # Paste only plain text.
         self.insertPlainText(mime_data.text())
 
-
 class TermWidget(QWidget):
     """
     Widget wich represents terminal. It only displays text and allows to enter text.

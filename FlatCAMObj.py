@@ -1,10 +1,10 @@
-# ###########################################################
+############################################################
 # FlatCAM: 2D Post-processing for Manufacturing            #
 # http://flatcam.org                                       #
 # Author: Juan Pablo Caram (c)                             #
 # Date: 2/5/2014                                           #
 # MIT Licence                                              #
-# ###########################################################
+############################################################
 
 from io import StringIO
 from PyQt5 import QtCore
@@ -17,9 +17,9 @@ from FlatCAMCommon import LoudDict
 from FlatCAMDraw import FlatCAMDraw
 
 
-# #######################################
-# #            FlatCAMObj              # #
-# #######################################
+########################################
+##            FlatCAMObj              ##
+########################################
 class FlatCAMObj(QtCore.QObject):
     """
     Base type of objects handled in FlatCAM. These become interactive
@@ -81,7 +81,7 @@ class FlatCAMObj(QtCore.QObject):
                 setattr(self, attr, d[attr])
 
     def on_options_change(self, key):
-        # self.emit(QtCore.SIGNAL("optionChanged()"), key)
+        #self.emit(QtCore.SIGNAL("optionChanged()"), key)
         self.option_changed.emit(self, key)
 
     def set_ui(self, ui):
@@ -188,7 +188,7 @@ class FlatCAMObj(QtCore.QObject):
         for option in self.options:
             try:
                 self.set_form_item(option)
-            except Exception:
+            except:
                 self.app.log.warning("Unexpected error:", sys.exc_info())
 
     def read_form(self):
@@ -202,7 +202,7 @@ class FlatCAMObj(QtCore.QObject):
         for option in self.options:
             try:
                 self.read_form_item(option)
-            except Exception:
+            except:
                 self.app.log.warning("Unexpected error:", sys.exc_info())
 
     def build_ui(self):
@@ -230,7 +230,7 @@ class FlatCAMObj(QtCore.QObject):
         # self.app.ui.selected_layout.addWidget(self.ui)
         try:
             self.app.ui.selected_scroll_area.takeWidget()
-        except Exception:
+        except:
             self.app.log.debug("Nothing to remove")
         self.app.ui.selected_scroll_area.setWidget(self.ui)
         self.to_form()
@@ -270,8 +270,7 @@ class FlatCAMObj(QtCore.QObject):
         #     option_type=type(self.options[option])
         #     try:
         #         value=self.form_fields[option].get_value()
-        #     #catch per option as it was ignored anyway, also when syntax error
-        #     (probably uninitialized field),don't read either.
+        #     #catch per option as it was ignored anyway, also when syntax error (probably uninitialized field),don't read either.
         #     except (KeyError,SyntaxError):
         #         self.app.log.warning("Failed to read option from field: %s" % option)
         # else:
@@ -542,13 +541,14 @@ class FlatCAMGerber(FlatCAMObj, Gerber):
             if invert:
                 if type(geom) is MultiPolygon:
                     pl = []
-                    for p in geom:
+                    for p in geom.geoms: # Use this line instead of the next line if shapely's version is >= 1.8.x.
+                    #for p in geom: # Use this line instead of the previous line if shapely's version is < 2.x.
                         pl.append(Polygon(p.exterior.coords[::-1], p.interiors))
                     geom = MultiPolygon(pl)
                 elif type(geom) is Polygon:
                     geom = Polygon(geom.exterior.coords[::-1], geom.interiors)
                 else:
-                    return str("Unexpected Geometry")
+                    raise str("Unexpected Geometry")
             return geom
 
         if combine:
@@ -559,9 +559,9 @@ class FlatCAMGerber(FlatCAMObj, Gerber):
                 # Propagate options
                 geo_obj.options["cnctooldia"] = self.options["isotooldia"]
                 geo_obj.solid_geometry = []
-                for x in range(passes):
-                    offset = (2 * x + 1) / 2.0 * dia - x * overlap * dia
-                    geom = generate_envelope(offset, x == 0)
+                for i in range(passes):
+                    offset = (2 * i + 1) / 2.0 * dia - i * overlap * dia
+                    geom = generate_envelope(offset, i == 0)
                     geo_obj.solid_geometry.append(geom)
                 app_obj.inform.emit("Isolation geometry created: %s" % geo_obj.options["name"])
 
@@ -716,8 +716,7 @@ class FlatCAMExcellon(FlatCAMObj, Excellon):
         Merge excellons in exc_list into exc_final.
         Options are allways copied from source .
 
-        Tools are also merged, if  name for  tool is same and   size differs,
-        then as name is used next available  number from both lists
+        Tools are also merged, if  name for  tool is same and   size differs, then as name is used next available  number from both lists
 
         if only one object is  specified in exc_list then this acts  as copy only
 
@@ -746,13 +745,13 @@ class FlatCAMExcellon(FlatCAMObj, Excellon):
                 #    exc.to_form()
                 #    exc.read_form()
                 for option in exc.options:
-                    if option != 'name':
+                    if option is not 'name':
                         try:
                             exc_final.options[option] = exc.options[option]
-                        except Exception:
+                        except:
                             exc.app.log.warning("Failed to copy option.", option)
 
-                # deep copy of all drills,to avoid any references
+                #deep copy of all drills,to avoid any references
                 for drill in exc.drills:
                     point = Point(drill['point'].x, drill['point'].y)
                     exc_final.drills.append({"point": point, "tool": drill['tool']})
@@ -764,7 +763,7 @@ class FlatCAMExcellon(FlatCAMObj, Excellon):
                         max_numeric_tool = numeric_tool
                     toolsrework[exc.tools[toolname]['C']] = toolname
 
-                # exc_final as last because names from final tools will be used
+                #exc_final as last because names from final tools will be used
                 for toolname in list(exc_final.tools.copy().keys()):
                     numeric_tool = int(toolname)
                     if numeric_tool > max_numeric_tool:
@@ -777,7 +776,7 @@ class FlatCAMExcellon(FlatCAMObj, Excellon):
                             exc_final.tools[str(max_numeric_tool + 1)] = {"C": toolvalues}
                     else:
                         exc_final.tools[toolsrework[toolvalues]] = {"C": toolvalues}
-                # this value  was not co
+                #this value  was not co
                 exc_final.zeros = exc.zeros
                 exc_final.create_geometry()
 
@@ -794,7 +793,7 @@ class FlatCAMExcellon(FlatCAMObj, Excellon):
         i = 0
         for tool in self.tools:
 
-            drill_cnt = 0  # variable to store the nr of drills per tool
+            drill_cnt = 0 # variable to store the nr of drills per tool
             # Find no of drills for the current tool
             for drill in self.drills:
                 if drill.get('tool') == tool:
@@ -1113,22 +1112,42 @@ class FlatCAMCNCjob(FlatCAMObj, CNCjob):
         self.read_form()
         self.plot()
 
+    # TODO this function is exactly the same as the one in FlatCAMApp.py (except the log is not self.log), only one of them should exist.
+    # Example of a filename received and of a filepathandname returned:
+    #     "('\home\user\file.example', 'All Files (*)')"
+    #     "\home\user\file.example"
+    # Another example:
+    #     "('C:\Users\user\file.example', 'All Files (*)')"
+    #     "C:\Users\user\file.example"
+    # TODO improve this function
+    def extract_file_name_with_path(self, filename):
+        filepathandname = filename
+        try:
+            if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+                log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+                filepathandname = filename[len("('"):filename.find("', '")]
+                log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        except NoneType:
+            return filename
+        return filepathandname
+
     def on_exportgcode_button_click(self, *args):
         self.app.report_usage("cncjob_on_exportgcode_button")
 
         self.read_form()
 
         try:
-            filename, _ = QtWidgets.QFileDialog.getSaveFileName(caption="Export G-Code ...",
-                                                                directory=self.app.defaults["last_folder"])
+            filename = str(QtWidgets.QFileDialog.getSaveFileName(caption="Export G-Code ...", directory=self.app.defaults["last_folder"]))
         except TypeError:
-            filename, _ = QtWidgets.QFileDialog.getSaveFileName(caption="Export G-Code ...")
+            filename = str(QtWidgets.QFileDialog.getSaveFileName(caption="Export G-Code ..."))
+
+        filepathandname = self.extract_file_name_with_path(filename)
 
         preamble = str(self.ui.prepend_text.get_value())
         postamble = str(self.ui.append_text.get_value())
         processor = str(self.ui.process_script.get_value())
 
-        self.export_gcode(filename, preamble=preamble, postamble=postamble, processor=processor)
+        self.export_gcode(filepathandname, preamble=preamble, postamble=postamble, processor=processor)
 
     def dwell_generator(self, lines):
         """
@@ -1166,28 +1185,31 @@ class FlatCAMCNCjob(FlatCAMObj, CNCjob):
 
         lines = StringIO(self.gcode)
 
-        # # Post processing
+        ## Post processing
         # Dwell?
         if self.options['dwell']:
             log.debug("Will add G04!")
             lines = self.dwell_generator(lines)
 
-        # # Write
-        with open(filename, 'w') as f:
+        filepathandname = self.extract_file_name_with_path(filename)
+
+        ## Write
+        with open(filepathandname, 'w') as f:
             f.write(preamble + "\n")
 
             for line in lines:
+
                 f.write(line)
 
             f.write(postamble)
 
         # Just for adding it to the recent files list.
-        self.app.file_opened.emit("cncjob", filename)
+        self.app.file_opened.emit("cncjob", filepathandname)
 
-        self.app.inform.emit("Saved to: " + filename)
+        self.app.inform.emit("Saved to: " + filepathandname)
 
     def get_gcode(self, preamble='', postamble=''):
-        # we need this to beable get_gcode separatelly for shell command export_code
+        #we need this to beable get_gcode separatelly for shell command export_code
         return preamble + '\n' + self.gcode + "\n" + postamble
 
     def on_plot_cb_click(self, *args):
@@ -1377,7 +1399,7 @@ class FlatCAMGeometry(FlatCAMObj, Geometry):
         def gen_paintarea(geo_obj, app_obj):
             assert isinstance(geo_obj, FlatCAMGeometry), \
                 "Initializer expected a FlatCAMGeometry, got %s" % type(geo_obj)
-            # assert isinstance(app_obj, App)
+            #assert isinstance(app_obj, App)
 
             if self.options["paintmethod"] == "seed":
                 # Type(cp) == FlatCAMRTreeStorage | None
@@ -1413,7 +1435,7 @@ class FlatCAMGeometry(FlatCAMObj, Geometry):
                 app_obj.new_object("geometry", name, gen_paintarea)
             except Exception as e:
                 proc.done()
-                return e
+                raise e
             proc.done()
 
         self.app.inform.emit("Polygon Paint started ...")
@@ -1498,7 +1520,7 @@ class FlatCAMGeometry(FlatCAMObj, Geometry):
             except Exception as e:
                 proc.done()
                 traceback.print_stack()
-                return e
+                raise e
             proc.done()
 
         self.app.inform.emit("Polygon Paint started ...")
@@ -1666,8 +1688,14 @@ class FlatCAMGeometry(FlatCAMObj, Geometry):
 
     def plot_element(self, element):
         try:
-            for sub_el in element:
-                self.plot_element(sub_el)
+
+            # Comment the following four lines if shapely's version is < 1.8.x.
+            if str(type(element)) == "<class 'shapely.geometry.multilinestring.MultiLineString'>" or str(type(element)) == "<class 'shapely.geometry.multipolygon.MultiPolygon'>":
+                for sub_el in element.geoms:
+                    self.plot_element(sub_el)
+            else:
+                for sub_el in element:
+                    self.plot_element(sub_el)
 
         except TypeError:  # Element is not iterable...
 
@@ -1684,7 +1712,7 @@ class FlatCAMGeometry(FlatCAMObj, Geometry):
                 self.axes.plot(x, y, 'r-')
                 return
 
-            FlatCAMApp.App.log.warning("Did not plot:" + str(type(element)))
+            FlatCAMApp.App.log.error("Did not plot: " + str(type(element)))
 
     def plot(self):
         """

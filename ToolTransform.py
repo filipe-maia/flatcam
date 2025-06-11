@@ -1,5 +1,4 @@
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5 import Qt
+from PyQt5 import QtWidgets, QtCore, Qt, QtGui
 from GUIElements import FCEntry, FCButton
 from FlatCAMTool import FlatCAMTool
 from camlib import *
@@ -17,7 +16,7 @@ class ToolTransform(FlatCAMTool):
 
         self.transform_lay = QtWidgets.QVBoxLayout()
         self.layout.addLayout(self.transform_lay)
-        # # Title
+        ## Title
         title_label = QtWidgets.QLabel("<font size=4><b>%s</b></font><br>" % self.toolName)
         self.transform_lay.addWidget(title_label)
 
@@ -29,11 +28,11 @@ class ToolTransform(FlatCAMTool):
         self.empty_label2.setFixedWidth(80)
         self.transform_lay.addWidget(self.empty_label)
 
-        # # Rotate Title
+        ## Rotate Title
         rotate_title_label = QtWidgets.QLabel("<font size=3><b>%s</b></font>" % self.rotateName)
         self.transform_lay.addWidget(rotate_title_label)
 
-        # # Form Layout
+        ## Form Layout
         form_layout = QtWidgets.QFormLayout()
         self.transform_lay.addLayout(form_layout)
 
@@ -63,11 +62,11 @@ class ToolTransform(FlatCAMTool):
 
         self.transform_lay.addWidget(self.empty_label1)
 
-        # # Skew Title
+        ## Skew Title
         skew_title_label = QtWidgets.QLabel("<font size=3><b>%s</b></font>" % self.skewName)
         self.transform_lay.addWidget(skew_title_label)
 
-        # # Form Layout
+        ## Form Layout
         form1_layout = QtWidgets.QFormLayout()
         self.transform_lay.addLayout(form1_layout)
 
@@ -114,11 +113,11 @@ class ToolTransform(FlatCAMTool):
 
         self.transform_lay.addWidget(self.empty_label2)
 
-        # # Flip Title
+        ## Flip Title
         flip_title_label = QtWidgets.QLabel("<font size=3><b>%s</b></font>" % self.flipName)
         self.transform_lay.addWidget(flip_title_label)
 
-        # # Form Layout
+        ## Form Layout
         form2_layout = QtWidgets.QFormLayout()
         self.transform_lay.addLayout(form2_layout)
 
@@ -143,7 +142,7 @@ class ToolTransform(FlatCAMTool):
 
         self.transform_lay.addStretch()
 
-        # # Signals
+        ## Signals
         self.rotate_button.clicked.connect(self.on_rotate)
         self.skewx_button.clicked.connect(self.on_skewx)
         self.skewy_button.clicked.connect(self.on_skewy)
@@ -154,7 +153,7 @@ class ToolTransform(FlatCAMTool):
         self.skewx_entry.returnPressed.connect(self.on_skewx)
         self.skewy_entry.returnPressed.connect(self.on_skewy)
 
-        # # Initialize form
+        ## Initialize form
         self.rotate_entry.set_value('0')
         self.skewx_entry.set_value('0')
         self.skewy_entry.set_value('0')
@@ -224,7 +223,7 @@ class ToolTransform(FlatCAMTool):
                 self.app.inform.emit('Object was rotated ...')
             except Exception as e:
                 self.app.inform.emit("[ERROR] Due of %s, rotation movement was not executed." % str(e))
-                return
+                raise
 
     def on_flip(self, axis):
         obj_list = self.app.collection.get_selected()
@@ -265,18 +264,18 @@ class ToolTransform(FlatCAMTool):
 
                 # execute mirroring
                 for obj in obj_list:
-                    if axis == 'X':
+                    if axis is 'X':
                         obj.mirror('X', [px, py])
                         obj.plot()
                         self.app.inform.emit('Flipped on the Y axis ...')
-                    elif axis == 'Y':
+                    elif axis is 'Y':
                         obj.mirror('Y', [px, py])
                         obj.plot()
                         self.app.inform.emit('Flipped on the X axis ...')
 
-            except Exception:
+            except Exception as e:
                 self.app.inform.emit("[ERROR] Due of %s, Flip action was not executed.")
-                return
+                raise
 
     def on_skew(self, axis, num):
         obj_list = self.app.collection.get_selected()
@@ -306,14 +305,14 @@ class ToolTransform(FlatCAMTool):
                 yminimal = min(yminlist)
 
                 for obj in obj_list:
-                    if axis == 'X':
+                    if axis is 'X':
                         obj.skew(num, 0, point=(xminimal, yminimal))
-                    elif axis == 'Y':
+                    elif axis is 'Y':
                         obj.skew(0, num, point=(xminimal, yminimal))
                     obj.plot()
                 self.app.inform.emit('Object was skewed on %s axis ...' % str(axis))
             except Exception as e:
                 self.app.inform.emit("[ERROR] Due of %s, Skew action was not executed." % str(e))
-                return
+                raise
 
 # end of file

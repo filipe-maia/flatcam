@@ -1,6 +1,4 @@
 from tclCommands.TclCommand import *
-from shapely.geometry import LineString
-from shapely.ops import unary_union
 
 
 class TclCommandCutout(TclCommand):
@@ -57,7 +55,7 @@ class TclCommandCutout(TclCommand):
 
         try:
             obj = self.app.collection.get_by_name(str(name))
-        except Exception:
+        except:
             return "Could not retrieve object: %s" % name
 
         def geo_init_me(geo_obj, app_obj):

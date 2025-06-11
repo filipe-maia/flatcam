@@ -1,21 +1,14 @@
-# ############################################################################
-# FlatCAM: 2D Post-processing for Manufacturing                              #
-# http://flatcam.org                                                         #
-# Author: Juan Pablo Caram (c)                                               #
-# Date: 2/5/2014                                                             #
-# MIT Licence                                                                #
-# ############################################################################
-
-# ############################################################################
-# ########  Ported to Python 3.x and PyQt5.x by Marius Stanciu  ##############
-# ########                20-Nov-2020                           ##############
-# ############################################################################
+############################################################
+# FlatCAM: 2D Post-processing for Manufacturing            #
+# http://flatcam.org                                       #
+# Author: Juan Pablo Caram (c)                             #
+# Date: 2/5/2014                                           #
+# MIT Licence                                              #
+############################################################
 
 import sys
 import traceback
-import urllib.request
-import urllib.parse
-import urllib.error
+import urllib.request, urllib.parse, urllib.error
 import getopt
 import random
 import logging
@@ -29,9 +22,9 @@ import time  # Just used for debugging. Double check before removing.
 from xml.dom.minidom import parseString as parse_xml_string
 from contextlib import contextmanager
 
-# #######################################
-# #      Imports part of FlatCAM       # #
-# #######################################
+########################################
+##      Imports part of FlatCAM       ##
+########################################
 import FlatCAMVersion
 from FlatCAMWorker import Worker
 import ObjectCollection
@@ -51,15 +44,15 @@ import tclCommands
 from camlib import *
 
 
-# #######################################
-# #                App                  #
-# #######################################
+########################################
+##                App                 ##
+########################################
 class App(QtCore.QObject):
     """
     The main application class. The constructor starts the GUI.
     """
 
-    # # Get Cmd Line Options
+    ## Get Cmd Line Options
     cmd_line_shellfile = ''
     cmd_line_help = "FlatCam.py --shellfile=<cmd_line_shellfile>"
     try:
@@ -74,7 +67,7 @@ class App(QtCore.QObject):
         elif opt == '--shellfile':
             cmd_line_shellfile = arg
 
-    # # Logging ##
+    ## Logging ##
     log = logging.getLogger('base')
     log.setLevel(logging.DEBUG)
     # log.setLevel(logging.WARNING)
@@ -83,24 +76,24 @@ class App(QtCore.QObject):
     handler.setFormatter(formatter)
     log.addHandler(handler)
 
-    # # Version
-    version = 8.5
-    # version_date_str = "2016/7"
+    ## Version
+    version = 9.0
+    #version_date_str = "2025/6"
     version_date = (0, 0, 0)
     version_name = None
 
-    # # URL for update checks and statistics
+    ## URL for update checks and statistics
     version_url = "http://flatcam.org/version"
 
-    # # App URL
+    ## App URL
     app_url = "http://flatcam.org"
 
-    # # Manual URL
+    ## Manual URL
     manual_url = "http://flatcam.org/manual/index.html"
 
-    # #################
-    # #    Signals   ##
-    # #################
+    ##################
+    ##    Signals   ##
+    ##################
 
     # Inform the user
     # Handled by:
@@ -160,24 +153,23 @@ class App(QtCore.QObject):
 
         App.log.info("FlatCAM Starting...")
 
-        # ##################
-        # ## OS-specific ###
-        # ##################
+        ###################
+        ### OS-specific ###
+        ###################
 
         # Folder for user settings.
         if sys.platform == 'win32':
-            from win32comext.shell import shell, shellcon
+            from win32com.shell import shell, shellcon
             App.log.debug("Win32!")
             self.data_path = shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, None, 0) + '/FlatCAM'
             self.os = 'windows'
         else:  # Linux/Unix/MacOS
-            self.data_path = os.path.expanduser('~') + \
-                             '/.FlatCAM'
+            self.data_path = os.path.expanduser('~') + '/.FlatCAM'
             self.os = 'unix'
 
-        # ##############################
-        # ## Setup folders and files ###
-        # ##############################
+        ###############################
+        ### Setup folders and files ###
+        ###############################
 
         if not os.path.exists(self.data_path):
             os.makedirs(self.data_path)
@@ -212,19 +204,16 @@ class App(QtCore.QObject):
         App.log.debug("Started in " + os.getcwd())
         os.chdir(self.app_home)
 
-        # ###################
-        # # Initialize GUI ##
-        # ###################
+        ####################
+        ## Initialize GUI ##
+        ####################
 
         QtCore.QObject.__init__(self)
 
         self.ui = FlatCAMGUI(self.version, name=self.version_name)
-        # self.connect(self.ui,
-        #              QtCore.SIGNAL("geomUpdate(int, int, int, int)"),
-        #              self.save_geometry)
-        self.ui.geom_update[int, int, int, int].connect(self.save_geometry)
+        self.ui.geomUpdate.connect(self.save_geometry)#self.ui.geomUpdate(int, int, int, int).connect(self.save_geometry)
 
-        # ### Plot Area ####
+        #### Plot Area ####
         # self.plotcanvas = PlotCanvas(self.ui.splitter)
         self.plotcanvas = PlotCanvas(self.ui.right_layout, self)
         self.plotcanvas.mpl_connect('button_press_event', self.on_click_over_plot)
@@ -233,9 +222,9 @@ class App(QtCore.QObject):
 
         self.ui.splitter.setStretchFactor(1, 2)
 
-        # #############
-        # ### Data ####
-        # #############
+        ##############
+        #### Data ####
+        ##############
         self.recent = []
 
         self.clipboard = QtWidgets.QApplication.clipboard()
@@ -313,7 +302,6 @@ class App(QtCore.QObject):
             "gerber_noncopperrounded": False,
             "gerber_bboxmargin": 0.0,
             "gerber_bboxrounded": False,
-            "gerber_use_buffer_for_union": True,
             "excellon_plot": True,
             "excellon_solid": False,
             "excellon_drillz": -0.1,
@@ -342,9 +330,9 @@ class App(QtCore.QObject):
             "cncjob_dwelltime": 1,
             "background_timeout": 300000,  # Default value is 5 minutes
             "verbose_error_level": 0,  # Shell verbosity 0 = default
-            # (python trace only for unknown errors),
-            # 1 = show trace(show trace allways),
-            # 2 = (For the future).
+                                       # (python trace only for unknown errors),
+                                       # 1 = show trace(show trace allways),
+                                       # 2 = (For the future).
 
             # Persistence
             "last_folder": None,
@@ -355,10 +343,10 @@ class App(QtCore.QObject):
             "def_win_h": 650,
 
             # Constants...
-            "defaults_save_period_ms": 20000,  # Time between default saves.
-            "shell_shape": [500, 300],  # Shape of the shell in pixels.
-            "shell_at_startup": False,  # Show the shell at startup.
-            "recent_limit": 10,  # Max. items in recent list.
+            "defaults_save_period_ms": 20000,   # Time between default saves.
+            "shell_shape": [500, 300],          # Shape of the shell in pixels.
+            "shell_at_startup": False,          # Show the shell at startup.
+            "recent_limit": 10,                 # Max. items in recent list.
             "fit_key": '1',
             "zoom_out_key": '2',
             "zoom_in_key": '3',
@@ -366,18 +354,18 @@ class App(QtCore.QObject):
             "point_clipboard_format": "(%.4f, %.4f)",
             "zdownrate": None,
             "excellon_zeros": "L",
-            "use_buffer_for_union": True,
+            "gerber_use_buffer_for_union": True,
             "cncjob_coordinate_format": "X%.4fY%.4f"
         })
 
-        # ##############################
-        # ## Load defaults from file ###
+        ###############################
+        ### Load defaults from file ###
         if user_defaults:
             self.load_defaults()
 
         chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
         if self.defaults['serial'] == 0 or len(str(self.defaults['serial'])) < 10:
-            self.defaults['serial'] = ''.join([random.choice(chars) for _ in range(20)])
+            self.defaults['serial'] = ''.join([random.choice(chars) for i in range(20)])
             self.save_defaults(silent=True)
 
         self.propagate_defaults()
@@ -477,48 +465,40 @@ class App(QtCore.QObject):
             "cncjob_append": "",
             "background_timeout": 300000,  # Default value is 5 minutes
             "verbose_error_level": 0,  # Shell verbosity:
-            # 0 = default(python trace only for unknown errors),
-            # 1 = show trace(show trace allways), 2 = (For the future).
+                                       # 0 = default(python trace only for unknown errors),
+                                       # 1 = show trace(show trace allways), 2 = (For the future).
         })
         self.options.update(self.defaults)  # Copy app defaults to project options
-        # self.options_write_form()
+        #self.options_write_form()
         self.on_options_combo_change(0)  # Will show the initial form
 
         self.collection = ObjectCollection.ObjectCollection()
         self.ui.project_tab_layout.addWidget(self.collection.view)
 
         self.mouse_pan_button = int(self.defaults['global_mouse_pan_button'])
-        # ### End of Data ####
+        #### End of Data ####
 
-        # ### Worker ####
+        #### Worker ####
         App.log.info("Starting Worker...")
         self.worker = Worker(self)
         self.thr1 = QtCore.QThread()
         self.worker.moveToThread(self.thr1)
-        # self.connect(self.thr1, QtCore.SIGNAL("started()"), self.worker.run)
         self.thr1.started.connect(self.worker.run)
         self.thr1.start()
 
-        # ### Check for updates ####
+        #### Check for updates ####
         # Separate thread (Not worker)
         App.log.info("Checking for updates in backgroud (this is version %s)." % str(self.version))
 
         self.worker2 = Worker(self, name="worker2")
         self.thr2 = QtCore.QThread()
         self.worker2.moveToThread(self.thr2)
-        # self.connect(self.thr2, QtCore.SIGNAL("started()"), self.worker2.run)
         self.thr2.started.connect(self.worker2.run)
-        # self.connect(self.thr2, QtCore.SIGNAL("started()"),
-        #              lambda: self.worker_task.emit({'fcn': self.version_check,
-        #                                             'params': [],
-        #                                             'worker_name': "worker2"}))
-        self.thr2.started.connect(
-            lambda: self.worker_task.emit({'fcn': self.version_check, 'params': [], 'worker_name': "worker2"})
-        )
+        self.thr2.started.connect(lambda: self.worker_task.emit({'fcn': self.version_check, 'params': [], 'worker_name': "worker2"}))
         self.thr2.start()
 
-        # ## Signal handling ###
-        # # Custom signals
+        ### Signal handling ###
+        ## Custom signals
         self.inform.connect(self.info)
         self.message.connect(self.message_dialog)
         self.progress.connect(self.set_progress_bar)
@@ -526,7 +506,7 @@ class App(QtCore.QObject):
         self.plots_updated.connect(self.on_plots_updated)
         self.file_opened.connect(self.register_recent)
         self.file_opened.connect(lambda kind, filename: self.register_folder(filename))
-        # # Standard signals
+        ## Standard signals
         # Menu
         self.ui.menufilenew.triggered.connect(self.on_file_new)
         self.ui.menufileopengerber.triggered.connect(self.on_fileopengerber)
@@ -578,20 +558,20 @@ class App(QtCore.QObject):
         # Options
         self.ui.options_combo.activated.connect(self.on_options_combo_change)
         self.options_form.units_radio.group_toggle_fn = self.on_toggle_units
-        # Notebook tabs
+        #Notebook tabs
 
-        # ###################
-        # ## Other setups ###
-        # ###################
+        ####################
+        ### Other setups ###
+        ####################
         # Sets up FlatCAMObj, FCProcess and FCProcessContainer.
         self.setup_obj_classes()
 
         self.setup_recent_items()
         self.setup_component_editor()
 
-        # ########################
-        # ## Tools and Plugins ###
-        # ########################
+        #########################
+        ### Tools and Plugins ###
+        #########################
         self.dblsidedtool = DblSidedTool(self)
         self.dblsidedtool.install(icon=QtGui.QIcon('share/doubleside16.png'), separator=True)
 
@@ -604,9 +584,9 @@ class App(QtCore.QObject):
 
         self.draw = FlatCAMDraw(self, disabled=True)
 
-        # ############
-        # ## Shell ###
-        # ############
+        #############
+        ### Shell ###
+        #############
         # TODO: Move this to its own class
 
         self.shell = FCShell(self)
@@ -625,9 +605,7 @@ class App(QtCore.QObject):
         self.ui.shell_dock = QtWidgets.QDockWidget("FlatCAM TCL Shell")
         self.ui.shell_dock.setWidget(self.shell)
         self.ui.shell_dock.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
-        self.ui.shell_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetMovable |
-                                       QtWidgets.QDockWidget.DockWidgetFloatable |
-                                       QtWidgets.QDockWidget.DockWidgetClosable)
+        self.ui.shell_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetClosable)
         self.ui.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.ui.shell_dock)
 
         if self.defaults["shell_at_startup"]:
@@ -680,7 +658,7 @@ class App(QtCore.QObject):
         try:
             self.defaults_form_fields[field].set_value(self.defaults[field])
         except KeyError:
-            # self.log.debug("defaults_write_form(): No field for: %s" % option)
+            #self.log.debug("defaults_write_form(): No field for: %s" % option)
             # TODO: Rethink this?
             pass
 
@@ -698,19 +676,19 @@ class App(QtCore.QObject):
         def worker_task(app_obj):
             percentage = 0.1
             try:
-                delta = 0.9 / len(app_obj.collection.get_list())
+                delta = 0.9 / len(self.collection.get_list())
             except ZeroDivisionError:
                 self.progress.emit(0)
                 return
             for obj in self.collection.get_list():
-                if obj != app_obj.collection.get_active() or not except_current:
+                if obj != self.collection.get_active() or not except_current:
                     obj.options['plot'] = False
                     obj.plot()
                 percentage += delta
-                app_obj.progress.emit(int(percentage * 100))
+                self.progress.emit(int(percentage * 100))
 
-            app_obj.progress.emit(0)
-            app_obj.plots_updated.emit()
+            self.progress.emit(0)
+            self.plots_updated.emit()
 
         # Send to worker
         self.worker_task.emit({'fcn': worker_task, 'params': [self]})
@@ -800,15 +778,15 @@ class App(QtCore.QObject):
         if not isinstance(unknownException, self.TclErrorException):
             self.raise_tcl_error("Unknown error: %s" % str(unknownException))
         else:
-            return unknownException
+            raise unknownException
 
     def display_tcl_error(self, error, error_info=None):
         """
-        escape bracket [ with \  otherwise there is error
+        escape bracket [ with \ otherwise there is error
         "ERROR: missing close-bracket" instead of real error
         :param error_info:
         :type error_info:
-        :param error: it may be text  or exception
+        :param error: it may be text or exception
         :return: None
         """
 
@@ -825,9 +803,7 @@ class App(QtCore.QObject):
                 trc_formated = []
                 for a in reversed(trc):
                     trc_formated.append(a.replace("    ", " > ").replace("\n", ""))
-                text = "%s\nPython traceback: %s\n%s" % (exc_value,
-                                                         exc_type,
-                                                         "\n".join(trc_formated))
+                text = "%s\nPython traceback: %s\n%s" % (exc_value, exc_type, "\n".join(trc_formated))
 
             else:
                 text = "%s" % error
@@ -846,7 +822,7 @@ class App(QtCore.QObject):
         """
 
         self.display_tcl_error(text)
-        return self.TclErrorException(text)
+        raise self.TclErrorException(text)
 
     def exec_command(self, text):
         """
@@ -887,7 +863,7 @@ class App(QtCore.QObject):
             self.shell.append_error('ERROR: ' + result + '\n')
             # Show error in console and just return or in test raise exception
             if reraise:
-                return e
+                raise e
 
         finally:
             self.shell.close_proccessing()
@@ -906,10 +882,10 @@ class App(QtCore.QObject):
                 self.shell.append_error("Unknown command\n")
                 return
 
-            # import inspect
-            # inspect.getargspec(someMethod)
-            if (type(commands[parts[0]]["params"]) is not list and len(parts) - 1 != commands[parts[0]]["params"]) or \
-                    (type(commands[parts[0]]["params"]) is list and len(parts) - 1 not in commands[parts[0]]["params"]):
+            #import inspect
+            #inspect.getargspec(someMethod)
+            if (type(commands[parts[0]]["params"]) is not list and len(parts)-1 != commands[parts[0]]["params"]) or \
+                    (type(commands[parts[0]]["params"]) is list and len(parts)-1 not in commands[parts[0]]["params"]):
                 self.shell.append_error(
                     "Command %s takes %d arguments. %d given.\n" %
                     (parts[0], commands[parts[0]]["params"], len(parts) - 1)
@@ -919,7 +895,7 @@ class App(QtCore.QObject):
             cmdfcn = commands[parts[0]]["fcn"]
             cmdconv = commands[parts[0]]["converters"]
             if len(parts) - 1 > 0:
-                retval = cmdfcn(*[cmdconv[i](parts[i + 1]) for i in range(len(parts) - 1)])
+                retval = cmdfcn(*[cmdconv[i](parts[i + 1]) for i in range(len(parts)-1)])
             else:
                 retval = cmdfcn()
             retfcn = commands[parts[0]]["retfcn"]
@@ -927,8 +903,8 @@ class App(QtCore.QObject):
                 self.shell.append_output(retfcn(retval) + "\n")
 
         except Exception as e:
-            # self.shell.append_error(''.join(traceback.format_exc()))
-            # self.shell.append_error("?\n")
+            #self.shell.append_error(''.join(traceback.format_exc()))
+            #self.shell.append_error("?\n")
             self.shell.append_error(str(e) + "\n")
 
     def info(self, msg, toshell=True):
@@ -976,7 +952,7 @@ class App(QtCore.QObject):
 
         try:
             defaults = json.loads(options)
-        except Exception:
+        except:
             e = sys.exc_info()[0]
             App.log.error(str(e))
             self.inform.emit("ERROR: Failed to parse defaults file.")
@@ -998,13 +974,34 @@ class App(QtCore.QObject):
         dlg.setText(message)
         dlg.exec_()
 
+    # TODO this function is exactly the same as the one in FlatCAMObj.py (except the self.log is not log), only one of them should exist.
+    # Example of a filename received and of a filepathandname returned:
+    #     "('\home\user\file.example', 'All Files (*)')"
+    #     "\home\user\file.example"
+    # Another example:
+    #     "('C:\Users\user\file.example', 'All Files (*)')"
+    #     "C:\Users\user\file.example"
+    # TODO improve this function
+    def extract_file_name_with_path(self, filename):
+        filepathandname = filename
+        try:
+            if "', '" in filename and filename.find("('") == 0 and filename.find("')") == len(filename) - len("')"):
+                self.log.debug("Will try to find file path and name in this string: <" + filename + ">.")
+                filepathandname = filename[len("('"):filename.find("', '")]
+                self.log.debug("Will try to open and/or save this file: <" + filepathandname + ">.")
+        except NoneType:
+            return filename
+        return filepathandname
+
     def register_recent(self, kind, filename):
 
         self.log.debug("register_recent()")
         self.log.debug("   %s" % kind)
         self.log.debug("   %s" % filename)
 
-        record = {'kind': str(kind), 'filename': str(filename)}
+        filepathandname = self.extract_file_name_with_path(filename)
+
+        record = {'kind': str(kind), 'filename': str(filepathandname)}
         if record in self.recent:
             return
 
@@ -1020,9 +1017,9 @@ class App(QtCore.QObject):
             self.inform.emit('Failed to open recent files file for writing.')
             return
 
-        # try:
+        #try:
         json.dump(self.recent, f)
-        # except Exception:
+        # except:
         #     App.log.error("Failed to write to recent items file.")
         #     self.inform.emit('ERROR: Failed to write to recent items file.')
         #     f.close()
@@ -1067,7 +1064,7 @@ class App(QtCore.QObject):
 
         t0 = time.time()  # Debug
 
-        # # Create object
+        ## Create object
         classdict = {
             "gerber": FlatCAMGerber,
             "excellon": FlatCAMExcellon,
@@ -1196,8 +1193,7 @@ class App(QtCore.QObject):
 
         self.save_defaults()
 
-    @staticmethod
-    def on_file_exit():
+    def on_file_exit(self):
         QtWidgets.qApp.quit()
 
     def save_defaults(self, silent=False):
@@ -1210,12 +1206,12 @@ class App(QtCore.QObject):
 
         self.report_usage("save_defaults")
 
-        # # Read options from file ##
+        ## Read options from file ##
         try:
             f = open(self.data_path + "/defaults.json")
             options = f.read()
             f.close()
-        except Exception:
+        except:
             e = sys.exc_info()[0]
             App.log.error("Could not load defaults file.")
             App.log.error(str(e))
@@ -1224,7 +1220,7 @@ class App(QtCore.QObject):
 
         try:
             defaults = json.loads(options)
-        except Exception:
+        except:
             e = sys.exc_info()[0]
             App.log.error("Failed to parse defaults file.")
             App.log.error(str(e))
@@ -1240,7 +1236,7 @@ class App(QtCore.QObject):
             f = open(self.data_path + "/defaults.json", "w")
             json.dump(defaults, f)
             f.close()
-        except Exception:
+        except:
             self.inform.emit("[error] Failed to write defaults to file.")
             return
 
@@ -1420,8 +1416,7 @@ class App(QtCore.QObject):
         # Options to scale
         dimensions = ['gerber_isotooldia', 'gerber_cutoutmargin', 'gerber_cutoutgapsize',
                       'gerber_noncoppermargin', 'gerber_bboxmargin', 'excellon_drillz',
-                      'excellon_travelz', 'excellon_feedrate', 'excellon_toolchangez', 'excellon_tooldia',
-                      'cncjob_tooldia',
+                      'excellon_travelz', 'excellon_feedrate', 'excellon_toolchangez', 'excellon_tooldia', 'cncjob_tooldia',
                       'geometry_cutz', 'geometry_travelz', 'geometry_feedrate',
                       'geometry_cnctooldia', 'geometry_painttooldia', 'geometry_paintoverlap',
                       'geometry_paintmargin']
@@ -1435,7 +1430,7 @@ class App(QtCore.QObject):
         if self.options_form.units_radio.get_value().upper() == 'MM':
             factor = 25.4
 
-        # Changing project units. warning user.
+        # Changing project units. Warn user.
         msgbox = QtWidgets.QMessageBox()
         msgbox.setText("<B>Change project units ...</B>")
         msgbox.setInformativeText("Changing the units of the project causes all geometrical "
@@ -1467,7 +1462,7 @@ class App(QtCore.QObject):
 
         self.options_read_form()
         self.inform.emit("Converted units to %s" % self.options["units"])
-        # self.ui.units_label.setText("[" + self.options["units"] + "]")
+        #self.ui.units_label.setText("[" + self.options["units"] + "]")
         self.set_screen_units(self.options["units"])
 
     def on_options_combo_change(self, sel):
@@ -1491,19 +1486,19 @@ class App(QtCore.QObject):
 
         # try:
         #     self.ui.options_area.removeWidget(self.defaults_form)
-        # except Exception:
+        # except:
         #     pass
         #
         # try:
         #     self.ui.options_area.removeWidget(self.options_form)
-        # except Exception:
+        # except:
         #     pass
 
         form = [self.defaults_form, self.options_form][sel]
         # self.ui.notebook.options_contents.pack_start(form, False, False, 1)
         try:
             self.ui.options_scroll_area.takeWidget()
-        except Exception:
+        except:
             self.log.debug("Nothing to remove")
         self.ui.options_scroll_area.setWidget(form)
         form.show()
@@ -1704,7 +1699,7 @@ class App(QtCore.QObject):
                 event.xdata, event.ydata))
             self.mouse = [event.xdata, event.ydata]
 
-        except Exception:
+        except:
             self.ui.position_label.setText("")
             self.mouse = None
 
@@ -1747,18 +1742,23 @@ class App(QtCore.QObject):
         App.log.debug("on_fileopengerber()")
 
         try:
-            filename, _ = QtWidgets.QFileDialog.getOpenFileName(caption="Open Gerber",
-                                                                directory=self.get_last_folder())
+            filename = QtWidgets.QFileDialog.getOpenFileName(caption="Open Gerber",
+                                                             directory=self.get_last_folder())
         except TypeError:
-            filename, _ = QtWidgets.QFileDialog.getOpenFileName(caption="Open Gerber")
+            filename = QtWidgets.QFileDialog.getOpenFileName(caption="Open Gerber")
 
         # The Qt methods above will return a QString which can cause problems later.
         # So far json.dump() will fail to serialize it.
+        # TODO: Improve the serialization methods and remove this fix.
+        filename = str(filename)
 
-        if filename == "":
+        filepathandname = self.extract_file_name_with_path(filename)
+
+        if filepathandname == "":
             self.inform.emit("Open cancelled.")
         else:
-            self.worker_task.emit({'fcn': self.open_gerber, 'params': [filename]})
+            self.worker_task.emit({'fcn': self.open_gerber,
+                                   'params': [filepathandname]})
 
     def on_fileopenexcellon(self):
         """
@@ -1771,18 +1771,23 @@ class App(QtCore.QObject):
         App.log.debug("on_fileopenexcellon()")
 
         try:
-            filename, _ = QtWidgets.QFileDialog.getOpenFileName(caption="Open Excellon",
-                                                                directory=self.get_last_folder())
+            filename = QtWidgets.QFileDialog.getOpenFileName(caption="Open Excellon",
+                                                             directory=self.get_last_folder())
         except TypeError:
-            filename, _ = QtWidgets.QFileDialog.getOpenFileName(caption="Open Excellon")
+            filename = QtWidgets.QFileDialog.getOpenFileName(caption="Open Excellon")
 
         # The Qt methods above will return a QString which can cause problems later.
         # So far json.dump() will fail to serialize it.
+        # TODO: Improve the serialization methods and remove this fix.
+        filename = str(filename)
 
-        if filename == "":
+        filepathandname = self.extract_file_name_with_path(filename)
+
+        if filepathandname == "":
             self.inform.emit("Open cancelled.")
         else:
-            self.worker_task.emit({'fcn': self.open_excellon, 'params': [filename]})
+            self.worker_task.emit({'fcn': self.open_excellon,
+                                   'params': [filepathandname]})
 
     def on_fileopengcode(self):
         """
@@ -1795,21 +1800,23 @@ class App(QtCore.QObject):
         App.log.debug("on_fileopengcode()")
 
         try:
-            filename, _ = QtWidgets.QFileDialog.getOpenFileName(caption="Open G-Code",
-                                                                directory=self.get_last_folder())
+            filename = QtWidgets.QFileDialog.getOpenFileName(caption="Open G-Code",
+                                                             directory=self.get_last_folder())
         except TypeError:
-            filename, _ = QtWidgets.QFileDialog.getOpenFileName(caption="Open G-Code")
+            filename = QtWidgets.QFileDialog.getOpenFileName(caption="Open G-Code")
 
         # The Qt methods above will return a QString which can cause problems later.
         # So far json.dump() will fail to serialize it.
         # TODO: Improve the serialization methods and remove this fix.
         filename = str(filename)
 
-        if filename == "":
+        filepathandname = self.extract_file_name_with_path(filename)
+
+        if filepathandname == "":
             self.inform.emit("Open cancelled.")
         else:
             self.worker_task.emit({'fcn': self.open_gcode,
-                                   'params': [filename]})
+                                   'params': [filepathandname]})
 
     def on_file_openproject(self):
         """
@@ -1822,24 +1829,26 @@ class App(QtCore.QObject):
         App.log.debug("on_file_openproject()")
 
         try:
-            filename, _ = QtWidgets.QFileDialog.getOpenFileName(caption="Open Project",
-                                                                directory=self.get_last_folder())
+            filename = QtWidgets.QFileDialog.getOpenFileName(caption="Open Project",
+                                                             directory=self.get_last_folder())
         except TypeError:
-            filename, _ = QtWidgets.QFileDialog.getOpenFileName(caption="Open Project")
+            filename = QtWidgets.QFileDialog.getOpenFileName(caption="Open Project")
 
         # The Qt methods above will return a QString which can cause problems later.
         # So far json.dump() will fail to serialize it.
         # TODO: Improve the serialization methods and remove this fix.
         filename = str(filename)
 
-        if filename == "":
+        filepathandname = self.extract_file_name_with_path(filename)
+
+        if filepathandname == "":
             self.inform.emit("Open cancelled.")
         else:
             # self.worker_task.emit({'fcn': self.open_project,
-            #                        'params': [filename]})
+            #                        'params': [filepathandname]})
             # The above was failing because open_project() is not
             # thread safe. The new_project()
-            self.open_project(filename)
+            self.open_project(filepathandname)
 
     def on_file_exportsvg(self):
         """
@@ -1862,8 +1871,8 @@ class App(QtCore.QObject):
             return
 
         # Check for more compatible types and add as required
-        if (not isinstance(obj, FlatCAMGeometry) and not isinstance(obj, FlatCAMGerber) and
-                not isinstance(obj, FlatCAMCNCjob) and not isinstance(obj, FlatCAMExcellon)):
+        if (not isinstance(obj, FlatCAMGeometry) and not isinstance(obj, FlatCAMGerber) and not isinstance(obj, FlatCAMCNCjob)
+            and not isinstance(obj, FlatCAMExcellon)):
             msg = "ERROR: Only Geometry, Gerber and CNCJob objects can be used."
             msgbox = QtWidgets.QMessageBox()
             msgbox.setInformativeText(msg)
@@ -1875,18 +1884,20 @@ class App(QtCore.QObject):
         name = self.collection.get_active().options["name"]
 
         try:
-            filename, _ = QtWidgets.QFileDialog.getSaveFileName(caption="Export SVG",
-                                                                directory=self.get_last_folder(), filter="*.svg")
+            filename = QtWidgets.QFileDialog.getSaveFileName(caption="Export SVG",
+                                                             directory=self.get_last_folder(), filter="*.svg")
         except TypeError:
-            filename, _ = QtWidgets.QFileDialog.getSaveFileName(caption="Export SVG")
+            filename = QtWidgets.QFileDialog.getSaveFileName(caption="Export SVG")
 
         filename = str(filename)
 
-        if filename == "":
+        filepathandname = self.extract_file_name_with_path(filename)
+
+        if filepathandname == "":
             self.inform.emit("Export SVG cancelled.")
             return
         else:
-            self.export_svg(name, filename)
+            self.export_svg(name, filepathandname)
 
     def on_file_importsvg(self):
         """
@@ -1898,18 +1909,20 @@ class App(QtCore.QObject):
         App.log.debug("on_file_importsvg()")
 
         try:
-            filename, _ = QtWidgets.QFileDialog.getOpenFileName(caption="Import SVG",
-                                                                directory=self.get_last_folder())
+            filename = QtWidgets.QFileDialog.getOpenFileName(caption="Import SVG",
+                                                             directory=self.get_last_folder())
         except TypeError:
-            filename, _ = QtWidgets.QFileDialog.getOpenFileName(caption="Import SVG")
+            filename = QtWidgets.QFileDialog.getOpenFileName(caption="Import SVG")
 
         filename = str(filename)
 
-        if filename == "":
+        filepathandname = self.extract_file_name_with_path(filename)
+
+        if filepathandname == "":
             self.inform.emit("Open cancelled.")
         else:
             self.worker_task.emit({'fcn': self.import_svg,
-                                   'params': [filename]})
+                                   'params': [filepathandname]})
 
     def on_file_saveproject(self):
         """
@@ -1941,15 +1954,16 @@ class App(QtCore.QObject):
         self.report_usage("on_file_saveprojectas")
 
         try:
-            filename, _ = QtWidgets.QFileDialog.getSaveFileName(caption="Save Project As ...",
-                                                                directory=self.get_last_folder())
+            filename = QtWidgets.QFileDialog.getSaveFileName(caption="Save Project As ...", directory=self.get_last_folder())
         except TypeError:
-            filename, _ = QtWidgets.QFileDialog.getSaveFileName(caption="Save Project As ...")
+            filename = QtWidgets.QFileDialog.getSaveFileName(caption="Save Project As ...")
 
         filename = str(filename)
 
+        filepathandname = self.extract_file_name_with_path(filename)
+
         try:
-            f = open(filename, 'r')
+            f = open(filepathandname, 'r')
             f.close()
             exists = True
         except IOError:
@@ -1965,11 +1979,11 @@ class App(QtCore.QObject):
             if result == QtWidgets.QMessageBox.Cancel:
                 return
 
-        self.save_project(filename)
-        self.file_opened.emit("project", filename)
+        self.save_project(filepathandname)
+        self.file_opened.emit("project", filepathandname)
 
         if not make_copy:
-            self.project_filename = filename
+            self.project_filename = filepathandname
             self.inform.emit("Project saved to: " + self.project_filename)
         else:
             self.inform.emit("Project copy saved to: " + self.project_filename)
@@ -1988,13 +2002,15 @@ class App(QtCore.QObject):
 
         self.log.debug("export_svg()")
 
+        filepathandname = self.extract_file_name_with_path(filename)
+
         try:
             obj = self.collection.get_by_name(str(obj_name))
-        except Exception:
+        except:
             # TODO: The return behavior has not been established... should raise exception?
             return "Could not retrieve object: %s" % obj_name
 
-        with self.proc_container.new("Exporting SVG"):
+        with self.proc_container.new("Exporting SVG") as proc:
             exported_svg = obj.export_svg(scale_factor=scale_factor)
 
             # Determine bounding area for svg export
@@ -2023,7 +2039,7 @@ class App(QtCore.QObject):
             # Parse the xml through a xml parser just to add line feeds
             # and to make it look more pretty for the output
             doc = parse_xml_string(svg_elem)
-            with open(filename, 'w') as fp:
+            with open(filepathandname, 'w') as fp:
                 fp.write(doc.toprettyxml())
 
     def import_svg(self, filename, outname=None):
@@ -2036,20 +2052,25 @@ class App(QtCore.QObject):
         :return:
         """
 
-        def obj_init(geo_obj, app_obj):
-            geo_obj.import_svg(filename)
+        self.log.debug("import_svg()")
 
-        with self.proc_container.new("Importing SVG"):
+        filepathandname = self.extract_file_name_with_path(filename)
+
+        def obj_init(geo_obj, app_obj):
+            geo_obj.import_svg(filepathandname)
+
+        with self.proc_container.new("Importing SVG") as proc:
+
             # Object name
-            name = outname or filename.split('/')[-1].split('\\')[-1]
+            name = outname or filepathandname.split('/')[-1].split('\\')[-1]
 
             self.new_object("geometry", name, obj_init)
 
             # Register recent file
-            self.file_opened.emit("svg", filename)
+            self.file_opened.emit("svg", filepathandname)
 
             # GUI feedback
-            self.inform.emit("Opened: " + filename)
+            self.inform.emit("Opened: " + filepathandname)
 
     def open_gerber(self, filename, follow=False, outname=None):
         """
@@ -2066,6 +2087,10 @@ class App(QtCore.QObject):
         :return: None
         """
 
+        App.log.debug("open_gerber()")
+
+        filepathandname = self.extract_file_name_with_path(filename)
+
         # How the object should be initialized
         def obj_init(gerber_obj, app_obj):
 
@@ -2075,53 +2100,51 @@ class App(QtCore.QObject):
             # Opening the file happens here
             self.progress.emit(30)
             try:
-                gerber_obj.parse_file(filename, follow=follow)
+                gerber_obj.parse_file(filepathandname, follow=follow)
+
             except IOError:
-                app_obj.inform.emit("[error] Failed to open file: " + filename)
+                app_obj.inform.emit("[error] Failed to open file: " + filepathandname)
                 app_obj.progress.emit(0)
-                log.debug('Failed to open file: ' + filename)
-                return
+                raise IOError('Failed to open file: ' + filepathandname)
 
             except ParseError as e:
-                app_obj.inform.emit("[error] Failed to parse file: " + filename + ". " + str(e))
+                app_obj.inform.emit("[error] Failed to parse file: " + filepathandname + ". " + e[0])
                 app_obj.progress.emit(0)
                 self.log.error(str(e))
-                return
+                raise
 
-            except Exception:
+            except:
                 msg = "[error] An internal error has ocurred. See shell.\n"
                 msg += traceback.format_exc()
                 app_obj.inform.emit(msg)
-                return
+                raise
 
             if gerber_obj.is_empty():
-                app_obj.inform.emit("[error] No geometry found in file: " + filename)
+                app_obj.inform.emit("[error] No geometry found in file: " + filepathandname)
                 self.collection.set_active(gerber_obj.options["name"])
                 self.collection.delete_active()
 
             # Further parsing
             self.progress.emit(70)  # TODO: Note the mixture of self and app_obj used here
 
-        App.log.debug("open_gerber()")
-
-        with self.proc_container.new("Opening Gerber"):
+        with self.proc_container.new("Opening Gerber") as proc:
 
             self.progress.emit(10)
 
             # Object name
-            name = outname or filename.split('/')[-1].split('\\')[-1]
+            name = outname or filepathandname.split('/')[-1].split('\\')[-1]
 
-            # ## Object creation ###
+            ### Object creation ###
             self.new_object("gerber", name, obj_init)
 
             # Register recent file
-            self.file_opened.emit("gerber", filename)
+            self.file_opened.emit("gerber", filepathandname)
 
             self.progress.emit(100)
-            # proc.done()
+            #proc.done()
 
             # GUI feedback
-            self.inform.emit("Opened: " + filename)
+            self.inform.emit("Opened: " + filepathandname)
 
     def open_excellon(self, filename, outname=None):
         """
@@ -2137,54 +2160,56 @@ class App(QtCore.QObject):
 
         App.log.debug("open_excellon()")
 
-        # self.progress.emit(10)
+        filepathandname = self.extract_file_name_with_path(filename)
+
+        #self.progress.emit(10)
 
         # How the object should be initialized
         def obj_init(excellon_obj, app_obj):
-            # self.progress.emit(20)
+            #self.progress.emit(20)
 
             try:
-                excellon_obj.parse_file(filename)
-            except IOError:
-                app_obj.inform.emit("[error] Cannot open file: " + filename)
-                self.progress.emit(0)  # TODO: self and app_bjj mixed
-                return "Cannot open file: " + filename
+                excellon_obj.parse_file(filepathandname)
 
-            except Exception:
+            except IOError:
+                app_obj.inform.emit("[error] Cannot open file: " + filepathandname)
+                self.progress.emit(0)  # TODO: self and app_bjj mixed
+                raise IOError("Cannot open file: " + filepathandname)
+
+            except:
                 msg = "[error] An internal error has ocurred. See shell.\n"
                 msg += traceback.format_exc()
-                log.debug(msg)
                 app_obj.inform.emit(msg)
-                return
+                raise
 
             try:
                 excellon_obj.create_geometry()
 
-            except Exception:
+            except:
                 msg = "[error] An internal error has ocurred. See shell.\n"
                 msg += traceback.format_exc()
                 app_obj.inform.emit(msg)
-                return
+                raise
 
             if excellon_obj.is_empty():
-                app_obj.inform.emit("[error] No geometry found in file: " + filename)
+                app_obj.inform.emit("[error] No geometry found in file: " + filepathandname)
                 self.collection.set_active(excellon_obj.options["name"])
                 self.collection.delete_active()
-            # self.progress.emit(70)
+            #self.progress.emit(70)
 
         with self.proc_container.new("Opening Excellon."):
 
             # Object name
-            name = outname or filename.split('/')[-1].split('\\')[-1]
+            name = outname or filepathandname.split('/')[-1].split('\\')[-1]
 
             self.new_object("excellon", name, obj_init)
 
             # Register recent file
-            self.file_opened.emit("excellon", filename)
+            self.file_opened.emit("excellon", filepathandname)
 
             # GUI feedback
-            self.inform.emit("Opened: " + filename)
-            # self.progress.emit(100)
+            self.inform.emit("Opened: " + filepathandname)
+            #self.progress.emit(100)
 
     def open_gcode(self, filename, outname=None):
         """
@@ -2198,6 +2223,8 @@ class App(QtCore.QObject):
         :return: None
         """
         App.log.debug("open_gcode()")
+
+        filepathandname = self.extract_file_name_with_path(filename)
 
         # How the object should be initialized
         def obj_init(job_obj, app_obj_):
@@ -2213,13 +2240,13 @@ class App(QtCore.QObject):
             self.progress.emit(10)
 
             try:
-                f = open(filename)
+                f = open(filepathandname)
                 gcode = f.read()
                 f.close()
             except IOError:
-                app_obj_.inform.emit("[error] Failed to open " + filename)
+                app_obj_.inform.emit("[error] Failed to open " + filepathandname)
                 self.progress.emit(0)
-                return ("Failed to open " + filename)
+                raise IOError("Failed to open " + filepathandname)
 
             job_obj.gcode = gcode
 
@@ -2232,7 +2259,7 @@ class App(QtCore.QObject):
         with self.proc_container.new("Opening G-Code."):
 
             # Object name
-            name = outname or filename.split('/')[-1].split('\\')[-1]
+            name = outname or filepathandname.split('/')[-1].split('\\')[-1]
 
             # New object creation and file processing
             try:
@@ -2243,16 +2270,16 @@ class App(QtCore.QObject):
                 self.message_dialog("Failed to create CNCJob Object",
                                     "Attempting to create a FlatCAM CNCJob Object from " +
                                     "G-Code file failed during processing:\n" +
-                                    str(e), kind="error")
+                                    str(e[0]) + " " + str(e[1]), kind="error")
                 self.progress.emit(0)
                 self.collection.delete_active()
-                return e
+                raise e
 
             # Register recent file
-            self.file_opened.emit("cncjob", filename)
+            self.file_opened.emit("cncjob", filepathandname)
 
             # GUI feedback
-            self.inform.emit("Opened: " + filename)
+            self.inform.emit("Opened: " + filepathandname)
             self.progress.emit(100)
 
     def open_project(self, filename):
@@ -2272,45 +2299,46 @@ class App(QtCore.QObject):
         """
         App.log.debug("Opening project: " + filename)
 
-        # # Open and parse
+        filepathandname = self.extract_file_name_with_path(filename)
+
+        ## Open and parse
         try:
-            f = open(filename, 'r')
+            f = open(filepathandname, 'r')
         except IOError:
-            App.log.error("Failed to open project file: %s" % filename)
-            self.inform.emit("[error] Failed to open project file: %s" % filename)
+            App.log.error("Failed to open project file: %s" % filepathandname)
+            self.inform.emit("[error] Failed to open project file: %s" % filepathandname)
             return
 
         try:
             d = json.load(f, object_hook=dict2obj)
-        except Exception:
-            App.log.error("Failed to parse project file: %s" % filename)
-            self.inform.emit("[error] Failed to parse project file: %s" % filename)
+        except:
+            App.log.error("Failed to parse project file: %s" % filepathandname)
+            self.inform.emit("[error] Failed to parse project file: %s" % filepathandname)
             f.close()
             return
 
-        self.file_opened.emit("project", filename)
+        self.file_opened.emit("project", filepathandname)
 
-        # # Clear the current project
-        # # NOT THREAD SAFE ##
+        ## Clear the current project
+        ## NOT THREAD SAFE ##
         self.on_file_new()
 
-        # #Project options
+        ##Project options
         self.options.update(d['options'])
-        self.project_filename = filename
-        # self.ui.units_label.setText("[" + self.options["units"] + "]")
+        self.project_filename = filepathandname
+        #self.ui.units_label.setText("[" + self.options["units"] + "]")
         self.set_screen_units(self.options["units"])
 
-        # # Re create objects
+        ## Re create objects
         App.log.debug("Re-creating objects...")
         for obj in d['objs']:
             def obj_init(obj_inst, app_inst):
                 obj_inst.from_dict(obj)
-
             App.log.debug(obj['kind'] + ":  " + obj['options']['name'])
             self.new_object(obj['kind'], obj['options']['name'], obj_init, active=False, fit=False, plot=False)
 
         self.plot_all()
-        self.inform.emit("Project loaded from: " + filename)
+        self.inform.emit("Project loaded from: " + filepathandname)
         App.log.debug("Project loaded")
 
     def propagate_defaults(self):
@@ -2328,7 +2356,7 @@ class App(QtCore.QObject):
         routes = {
             "zdownrate": CNCjob,
             "excellon_zeros": Excellon,
-            "use_buffer_for_union": Gerber,
+            "gerber_use_buffer_for_union": Gerber,
             "cncjob_coordinate_format": CNCjob
             # "spindlespeed": CNCjob
         }
@@ -2369,23 +2397,25 @@ class App(QtCore.QObject):
         def worker_task(app_obj):
             percentage = 0.1
             try:
-                delta = 0.9 / len(app_obj.collection.get_list())
+                delta = 0.9 / len(self.collection.get_list())
             except ZeroDivisionError:
-                app_obj.progress.emit(0)
+                self.progress.emit(0)
                 return
-            for obj in app_obj.collection.get_list():
+            for obj in self.collection.get_list():
                 obj.plot()
                 percentage += delta
-                app_obj.progress.emit(int(percentage * 100))
+                self.progress.emit(int(percentage * 100))
 
-            app_obj.progress.emit(0)
-            app_obj.plots_updated.emit()
+            self.progress.emit(0)
+            self.plots_updated.emit()
 
         # Send to worker
-        # self.worker.add_task(worker_task, [self])
+        #self.worker.add_task(worker_task, [self])
         self.worker_task.emit({'fcn': worker_task, 'params': [self]})
 
     def register_folder(self, filename):
+        self.log.debug("register_folder")
+        filepathandname = self.extract_file_name_with_path(filename)
         self.defaults["last_folder"] = os.path.split(str(filename))[0]
 
     def set_progress_bar(self, percentage, text=""):
@@ -2481,7 +2511,7 @@ class App(QtCore.QObject):
             if timeout is not None:
                 QtCore.QTimer.singleShot(timeout, report_quit)
 
-            # ### Block ####
+            #### Block ####
             loop.exec_()
 
             # Restore exception management
@@ -2490,7 +2520,7 @@ class App(QtCore.QObject):
                 self.raiseTclError(str(ex[0]))
 
             if status['timed_out']:
-                return ('Timed out!')
+                raise Exception('Timed out!')
 
         # def wait_signal2(signal, timeout=10000):
         #     """Block loop until signal emitted, or timeout (ms) elapses."""
@@ -2650,7 +2680,7 @@ class App(QtCore.QObject):
         #
         #     try:
         #         obj = self.collection.get_by_name(str(name))
-        #     except Exception:
+        #     except:
         #         return "Could not retrieve object: %s" % name
         #
         #     def geo_init_me(geo_obj, app_obj):
@@ -2733,7 +2763,7 @@ class App(QtCore.QObject):
         #
         #         try:
         #             obj = self.collection.get_by_name(str(name))
-        #         except Exception:
+        #         except:
         #             self.raise_tcl_error("Could not retrieve object: %s" % name)
         #
         #         # Get min and max data for each object as we just cut rectangles across X or Y
@@ -2801,7 +2831,7 @@ class App(QtCore.QObject):
         #     # Get source object.
         #     try:
         #         obj = self.collection.get_by_name(str(name))
-        #     except Exception:
+        #     except:
         #         return "Could not retrieve object: %s" % name
         #
         #     if obj is None:
@@ -2822,7 +2852,7 @@ class App(QtCore.QObject):
         #     if 'box' in kwa:
         #         try:
         #             box = self.collection.get_by_name(kwa['box'])
-        #         except Exception:
+        #         except:
         #             return "Could not retrieve object box: %s" % kwa['box']
         #
         #         if box is None:
@@ -2934,14 +2964,13 @@ class App(QtCore.QObject):
         #     # Get source object.
         #     try:
         #         obj = self.collection.get_by_name(str(name))
-        #     except Exception:
+        #     except:
         #         return "Could not retrieve object: %s" % name
         #
         #     if obj is None:
         #         return "Object not found: %s" % name
         #
-        #     if not isinstance(obj, FlatCAMGeometry) and not isinstance(obj, FlatCAMGerber) and
-        #         not isinstance(obj, FlatCAMExcellon):
+        #     if not isinstance(obj, FlatCAMGeometry) and not isinstance(obj, FlatCAMGerber) and not isinstance(obj, FlatCAMExcellon):
         #         return "ERROR: Only Gerber, Geometry and Excellon objects can be used."
         #
         #     # Axis
@@ -2982,8 +3011,7 @@ class App(QtCore.QObject):
         #             else:
         #                 axisoffset = 0
         #
-        #             # This will align hole to given aligngridoffset and minimal offset from pcb,
-        #             # based on selected axis
+        #             # This will align hole to given aligngridoffset and minimal offset from pcb, based on selected axis
         #             if axis == "X":
         #                 firstpoint = kwa['gridoffset']
         #
@@ -3024,7 +3052,7 @@ class App(QtCore.QObject):
         #     if 'box' in kwa:
         #         try:
         #             box = self.collection.get_by_name(kwa['box'])
-        #         except Exception:
+        #         except:
         #             return "Could not retrieve object box: %s" % kwa['box']
         #
         #         if box is None:
@@ -3091,7 +3119,7 @@ class App(QtCore.QObject):
         #
         #         try:
         #             obj = self.collection.get_by_name(str(name))
-        #         except Exception:
+        #         except:
         #             self.raise_tcl_error("Could not retrieve object: %s" % name)
         #
         #         if obj is None:
@@ -3157,7 +3185,7 @@ class App(QtCore.QObject):
         #
         #         try:
         #             obj = self.collection.get_by_name(str(name))
-        #         except Exception:
+        #         except:
         #             self.raise_tcl_error("Could not retrieve object: %s" % name)
         #
         #         if obj is None:
@@ -3206,7 +3234,7 @@ class App(QtCore.QObject):
         #
         #         try:
         #             obj = self.collection.get_by_name(str(name))
-        #         except Exception:
+        #         except:
         #             self.raise_tcl_error("Could not retrieve object: %s" % name)
         #
         #         if obj is None:
@@ -3258,7 +3286,7 @@ class App(QtCore.QObject):
         #
         #         try:
         #             obj = self.collection.get_by_name(str(name))
-        #         except Exception:
+        #         except:
         #             self.raise_tcl_error("Could not retrieve object: %s" % name)
         #
         #         if obj is None:
@@ -3309,7 +3337,7 @@ class App(QtCore.QObject):
         #             self.raise_tcl_error("Cannot cast argument '%s' to type %s." % (key, types[key]))
         #     try:
         #         obj = self.collection.get_by_name(str(name))
-        #     except Exception:
+        #     except:
         #         self.raise_tcl_error("Could not retrieve object: %s" % name)
         #
         #     if obj is None:
@@ -3349,7 +3377,7 @@ class App(QtCore.QObject):
         #
         #     try:
         #         obj = self.collection.get_by_name(str(obj_name))
-        #     except Exception:
+        #     except:
         #         return "Could not retrieve object: %s" % obj_name
         #     if obj is None:
         #         return "Object not found: %s" % obj_name
@@ -3388,7 +3416,7 @@ class App(QtCore.QObject):
         #
         #     try:
         #         obj = self.collection.get_by_name(str(obj_name))
-        #     except Exception:
+        #     except:
         #         return "Could not retrieve object: %s" % obj_name
         #
         #     try:
@@ -3400,7 +3428,7 @@ class App(QtCore.QObject):
         # def paint_poly(obj_name, inside_pt_x, inside_pt_y, tooldia, overlap):
         #     try:
         #         obj = self.collection.get_by_name(str(obj_name))
-        #     except Exception:
+        #     except:
         #         return "Could not retrieve object: %s" % obj_name
         #     if obj is None:
         #         return "Object not found: %s" % obj_name
@@ -3422,7 +3450,7 @@ class App(QtCore.QObject):
         #
         #     try:
         #         obj = self.collection.get_by_name(str(obj_name))
-        #     except Exception:
+        #     except:
         #         return "Could not retrieve object: %s" % obj_name
         #     if obj is None:
         #         return "Object not found: %s" % obj_name
@@ -3450,7 +3478,7 @@ class App(QtCore.QObject):
         #
         #     try:
         #         obj = self.collection.get_by_name(str(obj_name))
-        #     except Exception:
+        #     except:
         #         return "Could not retrieve object: %s" % obj_name
         #     if obj is None:
         #         return "Object not found: %s" % obj_name
@@ -3469,7 +3497,7 @@ class App(QtCore.QObject):
         # def add_circle(obj_name, center_x, center_y, radius):
         #     try:
         #         obj = self.collection.get_by_name(str(obj_name))
-        #     except Exception:
+        #     except:
         #         return "Could not retrieve object: %s" % obj_name
         #     if obj is None:
         #         return "Object not found: %s" % obj_name
@@ -3498,7 +3526,7 @@ class App(QtCore.QObject):
         #
         #     try:
         #         obj = self.collection.get_by_name(str(obj_name))
-        #     except Exception:
+        #     except:
         #         return "Could not retrieve object: %s" % obj_name
         #     if obj is None:
         #         return "Object not found: %s" % obj_name
@@ -3555,7 +3583,7 @@ class App(QtCore.QObject):
         #     # Get source object.
         #     try:
         #         obj = self.collection.get_by_name(str(name))
-        #     except Exception:
+        #     except:
         #         return "Could not retrieve object: %s" % name
         #
         #     if obj is None:
@@ -3565,7 +3593,7 @@ class App(QtCore.QObject):
         #         boxname = kwa['box']
         #         try:
         #             box = self.collection.get_by_name(boxname)
-        #         except Exception:
+        #         except:
         #             return "Could not retrieve object: %s" % name
         #     else:
         #         box = obj
@@ -3644,36 +3672,36 @@ class App(QtCore.QObject):
             import collections
             od = collections.OrderedDict(sorted(commands.items()))
             for cmd_, val in list(od.items()):
-                # print cmd, '\n', ''.join(['~']*len(cmd))
+                #print cmd, '\n', ''.join(['~']*len(cmd))
                 output += cmd_ + ' \n' + ''.join(['~'] * len(cmd_)) + '\n'
 
                 t = val['help']
                 usage_i = t.find('>')
                 if usage_i < 0:
                     expl = t
-                    # print expl + '\n'
+                    #print expl + '\n'
                     output += expl + '\n\n'
                     continue
 
                 expl = t[:usage_i - 1]
-                # print expl + '\n'
+                #print expl + '\n'
                 output += expl + '\n\n'
 
                 end_usage_i = t[usage_i:].find('\n')
 
                 if end_usage_i < 0:
-                    # end_usage_i = len(t[usage_i:])
-                    # print '    ' + t[usage_i:]
-                    # print '       No parameters.\n'
+                    end_usage_i = len(t[usage_i:])
+                    #print '    ' + t[usage_i:]
+                    #print '       No parameters.\n'
                     output += '    ' + t[usage_i:] + '\n       No parameters.\n'
                 else:
                     extras = t[usage_i + end_usage_i + 1:]
                     parts = [s.strip() for s in extras.split('\n')]
 
-                    # print '    ' + t[usage_i:usage_i+end_usage_i]
+                    #print '    ' + t[usage_i:usage_i+end_usage_i]
                     output += '    ' + t[usage_i:usage_i + end_usage_i] + '\n'
                     for p in parts:
-                        # print '       ' + p + '\n'
+                        #print '       ' + p + '\n'
                         output += '       ' + p + '\n\n'
 
             return output
@@ -3690,7 +3718,7 @@ class App(QtCore.QObject):
         #
         #     try:
         #         obj = self.collection.get_by_name(str(obj_name))
-        #     except Exception:
+        #     except:
         #         return "Could not retrieve object: %s" % obj_name
         #     if obj is None:
         #         return "Object not found: %s" % obj_name
@@ -3712,7 +3740,7 @@ class App(QtCore.QObject):
         #
         #     try:
         #         obj = self.collection.get_by_name(str(obj_name))
-        #     except Exception:
+        #     except:
         #         return "Could not retrieve object: %s" % obj_name
         #     if obj is None:
         #         return "Object not found: %s" % obj_name
@@ -3775,8 +3803,7 @@ class App(QtCore.QObject):
 
             This behavior works only within main thread,
             errors with promissed tasks can be catched and detected only with log.
-            TODO: this problem have to be addressed somehow, maybe rewrite promissing to be blocking somehow for 
-            TCL shell.
+            TODO: this problem have to be addressed somehow, maybe rewrite promissing to be blocking somehow for TCL shell.
 
             Kamil's comment: I will rewrite existing TCL commands from time to time to follow this rules.
 
@@ -3898,8 +3925,7 @@ class App(QtCore.QObject):
             # 'cutout': {
             #     'fcn': cutout,
             #     'help': "Creates board cutout.\n" +
-            #             "> cutout <name> [-dia <3.0 (float)>] [-margin <0.0 (float)>] [-gapsize <0.5 (float)>]
-            #             [-gaps <lr (4|tb|lr)>]\n" +
+            #             "> cutout <name> [-dia <3.0 (float)>] [-margin <0.0 (float)>] [-gapsize <0.5 (float)>] [-gaps <lr (4|tb|lr)>]\n" +
             #             "   name: Name of the object\n" +
             #             "   dia: Tool diameter\n" +
             #             "   margin: Margin over bounds\n" +
@@ -3910,8 +3936,7 @@ class App(QtCore.QObject):
             # 'geocutout': {
             #     'fcn': geocutout,
             #     'help': "Cut holding gaps from geometry.\n" +
-            #             "> geocutout <name> [-dia <3.0 (float)>] [-margin <0.0 (float)>] [-gapsize <0.5 (float)>]
-            #             [-gaps <lr (8|4|tb|lr|2tb|2lr)>]\n" +
+            #             "> geocutout <name> [-dia <3.0 (float)>] [-margin <0.0 (float)>] [-gapsize <0.5 (float)>] [-gaps <lr (8|4|tb|lr|2tb|2lr)>]\n" +
             #             "   name: Name of the geometry object\n" +
             #             "   dia: Tool diameter\n" +
             #             "   margin: Margin over bounds\n" +
@@ -3946,8 +3971,7 @@ class App(QtCore.QObject):
             # 'aligndrillgrid': {
             #     'fcn': aligndrillgrid,
             #     'help': "Create excellon with drills for aligment grid.\n" +
-            #             "> aligndrillgrid <outname> [-dia <3.0 (float)>] -gridx <float> [-gridoffsetx <0 (float)>]
-            #             -gridy <float> [-gridoffsety <0 (float)>] -columns <int> -rows <int>\n" +
+            #             "> aligndrillgrid <outname> [-dia <3.0 (float)>] -gridx <float> [-gridoffsetx <0 (float)>] -gridy <float> [-gridoffsety <0 (float)>] -columns <int> -rows <int>\n" +
             #             "   outname: Name of the object to create.\n" +
             #             "   dia: Tool diameter\n" +
             #             "   gridx: grid size in X axis\n" +
@@ -3961,13 +3985,11 @@ class App(QtCore.QObject):
             # 'aligndrill': {
             #     'fcn': aligndrill,
             #     'help': "Create excellon with drills for aligment.\n" +
-            #             "> aligndrill <name> [-dia <3.0 (float)>] -axis <X|Y> [-box <nameOfBox> -minoffset <float>
-            #             [-grid <10 (float)> -gridoffset <5 (float)> [-axisoffset <0 (float)>]] | -dist <number>]\n" +
+            #             "> aligndrill <name> [-dia <3.0 (float)>] -axis <X|Y> [-box <nameOfBox> -minoffset <float> [-grid <10 (float)> -gridoffset <5 (float)> [-axisoffset <0 (float)>]] | -dist <number>]\n" +
             #             "   name: Name of the object (Gerber or Excellon) to mirror.\n" +
             #             "   dia: Tool diameter\n" +
             #             "   box: Name of object which act as box (cutout for example.)\n" +
-            #             "   grid: aligning  to grid, for thouse, who have aligning pins inside table in grid
-            #             (-5,0),(5,0),(15,0)..." +
+            #             "   grid: aligning  to grid, for thouse, who have aligning pins inside table in grid (-5,0),(5,0),(15,0)..." +
             #             "   gridoffset: offset of grid from 0 position" +
             #             "   minoffset: min and max distance between align hole and pcb" +
             #             "   axisoffset: offset on second axis before aligment holes" +
@@ -4040,8 +4062,7 @@ class App(QtCore.QObject):
             # 'cncjob': {
             #     'fcn': cncjob,
             #     'help': 'Generates a CNC Job from a Geometry Object.\n' +
-            #             '> cncjob <name> [-z_cut <c>] [-z_move <float>] [-feedrate <float>] [-tooldia <float>]
-            #             [-spindlespeed <int>] [-multidepth <bool>] [-depthperpass <float>] [-outname <str>]\n' +
+            #             '> cncjob <name> [-z_cut <c>] [-z_move <float>] [-feedrate <float>] [-tooldia <float>] [-spindlespeed <int>] [-multidepth <bool>] [-depthperpass <float>] [-outname <str>]\n' +
             #             '   name: Name of the source object\n' +
             #             '   z_cut: Z-axis cutting position\n' +
             #             '   z_move: Z-axis moving position\n' +
@@ -4132,11 +4153,9 @@ class App(QtCore.QObject):
             # 'panelize': {
             #     'fcn': panelize,
             #     'help': "Simple panelize geometries.\n" +
-            #             "> panelize <name> [-box <nameOfBox>]  [-spacing_columns <5 (float)>]
-            #             [-spacing_rows <5 (float)>] -columns <int> -rows <int>  [-outname <n>]\n" +
+            #             "> panelize <name> [-box <nameOfBox>]  [-spacing_columns <5 (float)>] [-spacing_rows <5 (float)>] -columns <int> -rows <int>  [-outname <n>]\n" +
             #             "   name: Name of the object to panelize.\n" +
-            #             "   box: Name of object which act as box (cutout for example.) for cutout boundary.
-            #             Object from name is used if not specified.\n" +
+            #             "   box: Name of object which act as box (cutout for example.) for cutout boundary. Object from name is used if not specified.\n" +
             #             "   spacing_columns: spacing between columns\n"+
             #             "   spacing_rows: spacing between rows\n"+
             #             "   columns: number of columns\n"+
@@ -4259,7 +4278,6 @@ class App(QtCore.QObject):
         def make_callback(func, fname):
             def opener():
                 func(fname)
-
             return opener
 
         # Reset menu
@@ -4312,14 +4330,17 @@ class App(QtCore.QObject):
         """
 
         self.log.debug("version_check()")
-        full_url = App.version_url + "?s=" + str(self.defaults['serial']) + "&v=" + str(self.version) + \
-                   "&os=" + str(self.os) + "&" + urllib.parse.urlencode(self.defaults["stats"])
+        full_url = App.version_url + \
+                   "?s=" + str(self.defaults['serial']) + \
+                   "&v=" + str(self.version) + \
+                   "&os=" + str(self.os) + \
+                   "&" + urllib.parse.urlencode(self.defaults["stats"])
         App.log.debug("Checking for updates @ %s" % full_url)
 
-        # ## Get the data
+        ### Get the data
         try:
             f = urllib.request.urlopen(full_url)
-        except Exception:
+        except:
             # App.log.warning("Failed checking for latest version. Could not connect.")
             self.log.warning("Failed checking for latest version. Could not connect.")
             self.inform.emit("[warning] Failed checking for latest version. Could not connect.")
@@ -4336,7 +4357,7 @@ class App(QtCore.QObject):
 
         f.close()
 
-        # ## Latest version?
+        ### Latest version?
         if self.version >= data["version"]:
             App.log.debug("FlatCAM is up to date!")
             self.inform.emit("[success] FlatCAM is up to date!")
@@ -4358,18 +4379,18 @@ class App(QtCore.QObject):
         def worker_task(app_obj):
             percentage = 0.1
             try:
-                delta = 0.9 / len(app_obj.collection.get_list())
+                delta = 0.9 / len(self.collection.get_list())
             except ZeroDivisionError:
-                app_obj.progress.emit(0)
+                self.progress.emit(0)
                 return
-            for obj in app_obj.collection.get_list():
+            for obj in self.collection.get_list():
                 obj.options['plot'] = True
                 obj.plot()
                 percentage += delta
                 self.progress.emit(int(percentage * 100))
 
-            app_obj.progress.emit(0)
-            app_obj.plots_updated.emit()
+            self.progress.emit(0)
+            self.plots_updated.emit()
 
         # Send to worker
         # self.worker.add_task(worker_task, [self])
@@ -4385,11 +4406,13 @@ class App(QtCore.QObject):
         """
         self.log.debug("save_project()")
 
-        # # Capture the latest changes
+        filepathandname = self.extract_file_name_with_path(filename)
+
+        ## Capture the latest changes
         # Current object
         try:
             self.collection.get_active().read_form()
-        except Exception:
+        except:
             self.log.debug("[warning] There was no active object")
             pass
         # Project options
@@ -4402,9 +4425,9 @@ class App(QtCore.QObject):
 
         # Open file
         try:
-            f = open(filename, 'w')
+            f = open(filepathandname, 'w')
         except IOError:
-            App.log.error("[error] Failed to open file for saving: %s", filename)
+            App.log.error("[error] Failed to open file for saving: %s", filepathandname)
             return
 
         # Write
@@ -4413,13 +4436,13 @@ class App(QtCore.QObject):
         #     json.dump(d, f, default=to_dict)
         # except Exception, e:
         #     print str(e)
-        #     App.log.error("[error] File open but failed to write: %s", filename)
+        #     App.log.error("[error] File open but failed to write: %s", filepathandname)
         #     f.close()
         #     return
 
         f.close()
 
-        self.inform.emit("Project saved to: %s" % filename)
+        self.inform.emit("Project saved to: %s" % filepathandname)
 
 # def main():
 #
@@ -4430,3 +4453,4 @@ class App(QtCore.QObject):
 #
 # if __name__ == '__main__':
 #     main()
+

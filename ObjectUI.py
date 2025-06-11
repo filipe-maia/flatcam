@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets, QtCore, QtGui
-# from GUIElements import *
+#from GUIElements import *
 from GUIElements import FCEntry, FloatEntry, EvalEntry, FCCheckBox, \
     LengthEntry, FCTextArea, IntEntry, RadioSet, OptionalInputSection
 
@@ -17,22 +17,22 @@ class ObjectUI(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout()
         self.setLayout(layout)
 
-        # # Page Title box (spacing between children)
+        ## Page Title box (spacing between children)
         self.title_box = QtWidgets.QHBoxLayout()
         layout.addLayout(self.title_box)
 
-        # # Page Title icon
+        ## Page Title icon
         pixmap = QtGui.QPixmap(icon_file)
         self.icon = QtWidgets.QLabel()
         self.icon.setPixmap(pixmap)
         self.title_box.addWidget(self.icon, stretch=0)
 
-        # # Title label
+        ## Title label
         self.title_label = QtWidgets.QLabel("<font size=5><b>" + title + "</b></font>")
         self.title_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
         self.title_box.addWidget(self.title_label, stretch=1)
 
-        # # Object name
+        ## Object name
         self.name_box = QtWidgets.QHBoxLayout()
         layout.addLayout(self.name_box)
         name_label = QtWidgets.QLabel("Name:")
@@ -40,16 +40,16 @@ class ObjectUI(QtWidgets.QWidget):
         self.name_entry = FCEntry()
         self.name_box.addWidget(self.name_entry)
 
-        # # Box box for custom widgets
+        ## Box box for custom widgets
         # This gets populated in offspring implementations.
         self.custom_box = QtWidgets.QVBoxLayout()
         layout.addLayout(self.custom_box)
 
-        # ##########################
-        # # Common to all objects ##
-        # ##########################
+        ###########################
+        ## Common to all objects ##
+        ###########################
 
-        # ### Scale ####
+        #### Scale ####
         self.scale_label = QtWidgets.QLabel('<b>Scale:</b>')
         self.scale_label.setToolTip(
             "Change the size of the object."
@@ -77,7 +77,7 @@ class ObjectUI(QtWidgets.QWidget):
         )
         layout.addWidget(self.scale_button)
 
-        # ### Offset ####
+        #### Offset ####
         self.offset_label = QtWidgets.QLabel('<b>Offset:</b>')
         self.offset_label.setToolTip(
             "Change the position of this object."
@@ -109,7 +109,7 @@ class ObjectUI(QtWidgets.QWidget):
         )
         layout.addWidget(self.auto_offset_button)
 
-        # ### Mirror ####
+        #### Mirror ####
         self.mirror_label = QtWidgets.QLabel('<b>Mirror:</b>')
         self.mirror_label.setToolTip(
             "Flip the object along an axis."
@@ -178,7 +178,7 @@ class CNCObjectUI(ObjectUI):
         self.mirror_auto_center_cb.hide()
         self.mirror_button.hide()
 
-        # # Plot options
+        ## Plot options
         self.plot_options_label = QtWidgets.QLabel("<b>Plot Options:</b>")
         self.custom_box.addWidget(self.plot_options_label)
 
@@ -210,9 +210,9 @@ class CNCObjectUI(ObjectUI):
         )
         self.custom_box.addWidget(self.updateplot_button)
 
-        # #################
-        # # Export G-Code
-        # #################
+        ##################
+        ## Export G-Code
+        ##################
         self.export_gcode_label = QtWidgets.QLabel("<b>Export G-Code:</b>")
         self.export_gcode_label.setToolTip(
             "Export and save G-Code to\n"
@@ -290,7 +290,7 @@ class GeometryObjectUI(ObjectUI):
     def __init__(self, parent=None):
         super(GeometryObjectUI, self).__init__(title='Geometry Object', icon_file='share/geometry32.png', parent=parent)
 
-        # # Plot options
+        ## Plot options
         self.plot_options_label = QtWidgets.QLabel("<b>Plot Options:</b>")
         self.custom_box.addWidget(self.plot_options_label)
 
@@ -301,9 +301,9 @@ class GeometryObjectUI(ObjectUI):
         )
         self.custom_box.addWidget(self.plot_cb)
 
-        # -----------------------------------
+        #-----------------------------------
         # Create CNC Job
-        # -----------------------------------
+        #-----------------------------------
         self.cncjob_label = QtWidgets.QLabel('<b>Create CNC Job:</b>')
         self.cncjob_label.setToolTip(
             "Create a CNC Job object\n"
@@ -393,9 +393,9 @@ class GeometryObjectUI(ObjectUI):
         )
         self.custom_box.addWidget(self.generate_cnc_button)
 
-        # ------------------------------
+        #------------------------------
         # Paint area
-        # ------------------------------
+        #------------------------------
         self.paint_label = QtWidgets.QLabel('<b>Paint Area:</b>')
         self.paint_label.setToolTip(
             "Creates tool paths to cover the\n"
@@ -481,11 +481,11 @@ class GeometryObjectUI(ObjectUI):
             "How to select the polygons to paint."
         )
         grid2.addWidget(selectlabel, 6, 0)
-        # grid3 = QtWidgets.QGridLayout()
+        #grid3 = QtWidgets.QGridLayout()
         self.selectmethod_combo = RadioSet([
             {"label": "Single", "value": "single"},
             {"label": "All", "value": "all"},
-            # {"label": "Rectangle", "value": "rectangle"}
+            #{"label": "Rectangle", "value": "rectangle"}
         ])
         grid2.addWidget(self.selectmethod_combo, 6, 1)
 
@@ -510,7 +510,7 @@ class ExcellonObjectUI(ObjectUI):
                           icon_file='share/drill32.png',
                           parent=parent)
 
-        # ### Plot options ####
+        #### Plot options ####
 
         self.plot_options_label = QtWidgets.QLabel("<b>Plot Options:</b>")
         self.custom_box.addWidget(self.plot_options_label)
@@ -528,7 +528,7 @@ class ExcellonObjectUI(ObjectUI):
         )
         grid0.addWidget(self.solid_cb, 0, 1)
 
-        # ### Tools ####
+        #### Tools ####
 
         self.tools_table_label = QtWidgets.QLabel('<b>Tools</b>')
         self.tools_table_label.setToolTip(
@@ -539,7 +539,7 @@ class ExcellonObjectUI(ObjectUI):
         self.tools_table.setFixedHeight(100)
         self.custom_box.addWidget(self.tools_table)
 
-        # ### Create CNC Job ####
+        #### Create CNC Job ####
 
         self.cncjob_label = QtWidgets.QLabel('<b>Create CNC Job</b>')
         self.cncjob_label.setToolTip(
@@ -621,7 +621,7 @@ class ExcellonObjectUI(ObjectUI):
         )
         self.custom_box.addWidget(self.generate_cnc_button)
 
-        # ### Milling Holes ####
+        #### Milling Holes ####
         self.mill_hole_label = QtWidgets.QLabel('<b>Mill Holes</b>')
         self.mill_hole_label.setToolTip(
             "Create Geometry for milling holes."
@@ -660,7 +660,7 @@ class GerberObjectUI(ObjectUI):
     def __init__(self, parent=None):
         ObjectUI.__init__(self, title='Gerber Object', parent=parent)
 
-        # # Plot options
+        ## Plot options
         self.plot_options_label = QtWidgets.QLabel("<b>Plot Options:</b>")
         self.custom_box.addWidget(self.plot_options_label)
 
@@ -687,7 +687,7 @@ class GerberObjectUI(ObjectUI):
         )
         grid0.addWidget(self.multicolored_cb, 0, 2)
 
-        # # Isolation Routing
+        ## Isolation Routing
         self.isolation_routing_label = QtWidgets.QLabel("<b>Isolation Routing:</b>")
         self.isolation_routing_label.setToolTip(
             "Create a Geometry object with\n"
@@ -737,7 +737,7 @@ class GerberObjectUI(ObjectUI):
         )
         self.custom_box.addWidget(self.generate_iso_button)
 
-        # # Board cuttout
+        ## Board cuttout
         self.board_cutout_label = QtWidgets.QLabel("<b>Board cutout:</b>")
         self.board_cutout_label.setToolTip(
             "Create toolpaths to cut around\n"
@@ -793,7 +793,7 @@ class GerberObjectUI(ObjectUI):
         )
         self.custom_box.addWidget(self.generate_cutout_button)
 
-        # # Non-copper regions
+        ## Non-copper regions
         self.noncopper_label = QtWidgets.QLabel("<b>Non-copper regions:</b>")
         self.noncopper_label.setToolTip(
             "Create polygons covering the\n"
@@ -830,7 +830,7 @@ class GerberObjectUI(ObjectUI):
         self.generate_noncopper_button = QtWidgets.QPushButton('Generate Geometry')
         self.custom_box.addWidget(self.generate_noncopper_button)
 
-        # # Bounding box
+        ## Bounding box
         self.boundingbox_label = QtWidgets.QLabel('<b>Bounding Box:</b>')
         self.custom_box.addWidget(self.boundingbox_label)
 
@@ -861,6 +861,7 @@ class GerberObjectUI(ObjectUI):
         )
         self.custom_box.addWidget(self.generate_bb_button)
 
+
 # def main():
 #
 #     app = QtWidgets.QApplication(sys.argv)
@@ -870,3 +871,4 @@ class GerberObjectUI(ObjectUI):
 #
 # if __name__ == '__main__':
 #     main()
+

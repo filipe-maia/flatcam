@@ -1,5 +1,4 @@
 from tclCommands.TclCommand import *
-from camlib import Geometry
 
 
 class TclCommandPaint(TclCommandSignaled):
@@ -80,3 +79,4 @@ class TclCommandPaint(TclCommandSignaled):
         y = args['y']
 
         obj.paint_poly_single_click([x, y], tooldia, overlap, outname)
+
