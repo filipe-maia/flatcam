@@ -9,13 +9,13 @@ CAD program, and create G-Code for Isolation routing.
 
 To start this program you need Python installed in your computer (tested with version 3.13.4).
 
-Before starting this program for the first time on your computer, make sure you have all the required Python dependencies by running 'pip install -r requirements.txt' (and, if you are on Windows, 'pip install -r requirements_windows.txt' as well).
+Before starting this program for the first time on your computer, make sure you have all the required Python dependencies by running 'pip install -r requirements.txt' (and, if you are on Windows, 'pip install -r requirements_windows.txt' as well). Tested with NumPy 2.3.0, MatPlotLib 3.10.3, RTree 1.4.0, SciPy 1.15.3, SimpleJson 3.20.1 and svg.path 6.3. 
 
 To start this program run 'py flatcam' or 'python flatcam'.
 
 If you are using Windows, you can use FlatCAM.bat.
 
-NOTE: To use FlatCAM in an O.S. different from win64, delete the three folders of Shapely inside FlatCAM folder, then download Shapely 1.8.5 for the target O.S. and place it inside FlatCAM folder.
+NOTE: To use FlatCAM in an O.S. different from win64, delete the three folders of Shapely inside FlatCAM folder ("shapely", "Shapely.libs" and "Shapely-1.8.5.dist-info"), then download Shapely 1.8.5 for the target O.S. and place it inside FlatCAM folder.
 TODO: remove shapely 1.8.5_win64 from inside project folder and use the one installed by pip with the requirements.txt.
 
 TODO:
@@ -87,9 +87,18 @@ C:\flatcam\camlib.py:325: ShapelyDeprecationWarning: Iteration over multi-part g
   for geo in geometry:
 ```
 ```
-[DEBUG][MainThread] plot --> FlatCAMObj.plot()
-C:\flatcam\descartes\patch.py:66: ShapelyDeprecationWarning: The array interface is deprecated and will no longer work in Shapely 2.0. Convert the '.coords' to a numpy array instead.
-  return PathPatch(PolygonPath(polygon), **kwargs)
+[DEBUG][MainThread] on_paint_button_click--> FlatCAMObj.read_form()
+[DEBUG][MainThread] button=1, x=796, y=180, xdata=50.474986, ydata=-38.215010
+C:\flatcam\camlib.py:243: ShapelyDeprecationWarning: Iteration over multi-part geometries is deprecated and will be removed in Shapely 2.0. Use the `geoms` property to access the constituent parts of a multi-part geometry.
+  for sub_geo in geoset:
+```
+```
+[DEBUG] camlib.clear_polygon()
+C:\flatcam\camlib.py:537: ShapelyDeprecationWarning: Iteration over multi-part geometries is deprecated and will be removed in Shapely 2.0. Use the `geoms` property to access the constituent parts of a multi-part geometry.
+  for p in current:
+[DEBUG] Reducing tool lifts...
+C:\flatcam\shapely\geometry\base.py:250: ShapelyDeprecationWarning: Setting the 'coords' to mutate a Geometry in place is deprecated, and will not be possible any more in Shapely 2.0
+  super().__setattr__(name, value)
 ```
 
 TODO: For example, after clicking on button to generate CNC (this is probably related with the TODO "if using shapely versions 2.x the green areas won't be drawn"):
