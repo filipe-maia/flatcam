@@ -34,12 +34,10 @@ TODO:
 ```
 [DEBUG][MainThread] build_ui--> FlatCAMObj.to_form()
 [WARNING][MainThread] Tried to set an option or field that does not exist: coordinate_format
-[DEBUG][MainThread] on_zoom_fit--> OC.get_bounds()
 ```
 ```
 [DEBUG][MainThread] on_exportgcode_button_click--> FlatCAMObj.read_form()
 [WARNING][MainThread] Failed to read option from field: coordinate_format
-[DEBUG] Will add G04!
 ```
 ```
 ...
@@ -52,24 +50,46 @@ TODO:
 [WARNING] Union(buffer) done.
 [DEBUG][Dummy-2] 0.241575 seconds executing initialize().
 ```
+```
+[DEBUG][MainThread] on_auto_offset_button_click--> FlatCAMObj.read_form()
+[WARNING][MainThread] Failed to read option from field: zeros
+```
+```
+[DEBUG][MainThread] build_ui--> FlatCAMObj.to_form()
+[WARNING][MainThread] Tried to set an option or field that does not exist: zeros
+```
+```
+[DEBUG][MainThread] on_generate_milling_button_click--> FlatCAMObj.read_form()
+[WARNING][MainThread] Failed to read option from field: zeros
+```
+```
+[DEBUG][Dummy-40] set_active --> OC.get_names()
+QObject::connect: Cannot queue arguments of type 'QItemSelection'
+(Make sure 'QItemSelection' is registered using qRegisterMetaType().)
+QObject::connect: Cannot queue arguments of type 'QItemSelection'
+(Make sure 'QItemSelection' is registered using qRegisterMetaType().)
+```
 
 TODO: Warnings shown when using versions 1.8.x of shapely instead of versions 2.x:
 ```
 [DEBUG][MainThread] plot --> FlatCAMObj.plot()
-C:\flatcam\9.0shapely2.1.1\FlatCAMObj.py:640: ShapelyDeprecationWarning: Iteration over multi-part geometries is deprecated and will be removed in Shapely 2.0. Use the `geoms` property to access the constituent parts of a multi-part geometry.
+C:\flatcam\FlatCAMObj.py:640: ShapelyDeprecationWarning: Iteration over multi-part geometries is deprecated and will be removed in Shapely 2.0. Use the `geoms` property to access the constituent parts of a multi-part geometry.
   _ = iter(geometry)
-C:\flatcam\9.0shapely2.1.1\FlatCAMObj.py:650: ShapelyDeprecationWarning: Iteration over multi-part geometries is deprecated and will be removed in Shapely 2.0. Use the `geoms` property to access the constituent parts of a multi-part geometry.
+C:\flatcam\FlatCAMObj.py:650: ShapelyDeprecationWarning: Iteration over multi-part geometries is deprecated and will be removed in Shapely 2.0. Use the `geoms` property to access the constituent parts of a multi-part geometry.
   for poly in geometry:
-C:\flatcam\9.0shapely2.1.1\descartes\patch.py:66: ShapelyDeprecationWarning: The array interface is deprecated and will no longer work in Shapely 2.0. Convert the '.coords' to a numpy array instead.
+C:\flatcam\descartes\patch.py:66: ShapelyDeprecationWarning: The array interface is deprecated and will no longer work in Shapely 2.0. Convert the '.coords' to a numpy array instead.
   return PathPatch(PolygonPath(polygon), **kwargs)
-[DEBUG][Dummy-11] Canvas update requested: [0, 0, 0, 0, 0]
 ```
 ```
 [DEBUG][Dummy-19] 0.000382 seconds before initialize().
 [DEBUG] generate_from_geometry_2()
-C:\flatcam\9.0shapely2.1.1\camlib.py:325: ShapelyDeprecationWarning: Iteration over multi-part geometries is deprecated and will be removed in Shapely 2.0. Use the `geoms` property to access the constituent parts of a multi-part geometry.
+C:\flatcam\camlib.py:325: ShapelyDeprecationWarning: Iteration over multi-part geometries is deprecated and will be removed in Shapely 2.0. Use the `geoms` property to access the constituent parts of a multi-part geometry.
   for geo in geometry:
-[DEBUG] 41 paths
+```
+```
+[DEBUG][MainThread] plot --> FlatCAMObj.plot()
+C:\flatcam\descartes\patch.py:66: ShapelyDeprecationWarning: The array interface is deprecated and will no longer work in Shapely 2.0. Convert the '.coords' to a numpy array instead.
+  return PathPatch(PolygonPath(polygon), **kwargs)
 ```
 
 TODO: For example, after clicking on button to generate CNC (this is probably related with the TODO "if using shapely versions 2.x the green areas won't be drawn"):
@@ -80,6 +100,31 @@ TODO: For example, after clicking on button to generate CNC (this is probably re
 ```
 
 TODO: If using shapely versions 2.x the green areas won't be drawn. This is maybe related with the TODO "for example, after clicking on button to generate CNC".
+
+TODO: For example, after generating G-Code from an Excellon file, if after that a Gerber file is opened:
+```
+[DEBUG][MainThread] plot --> FlatCAMObj.plot()
+Traceback (most recent call last):
+  File "C:\flatcam\FlatCAMApp.py", line 1591, in on_object_created
+    obj.plot()
+    ~~~~~~~~^^
+  File "C:\flatcam\FlatCAMObj.py", line 653, in plot
+    patch = PolygonPatch(poly,
+                         facecolor="#BBF268",
+                         edgecolor="#006E20",
+                         alpha=0.75,
+                         zorder=2)
+  File "C:\flatcam\descartes\patch.py", line 66, in PolygonPatch
+    return PathPatch(PolygonPath(polygon), **kwargs)
+                     ~~~~~~~~~~~^^^^^^^^^
+  File "C:\flatcam\descartes\patch.py", line 44, in PolygonPath
+    [asarray(this.exterior)]
+             ^^^^^^^^^^^^^
+  File "C:\flatcam\descartes\patch.py", line 22, in exterior
+    or self.context['coordinates'][0])
+       ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+TypeError: 'Polygon' object is not subs
+```
 
 TODO: This error happens sometimes while starting FlatCAM, but application doesn't seem to bug out, so this is a minor bug.
 ```
@@ -109,10 +154,12 @@ C:\flatcam\ToolTransform.py:310: SyntaxWarning: "is" with 'str' literal. Did you
 [INFO][MainThread] FlatCAM Starting...
 ```
 
-TODO: This error happens sometimes while starting flatcam, and re-starting FlatCAM usually solves this error, so this is a minor bug:
+TODO: This error is maybe caused by the migration from pyqt4 to pyqt5 and happens sometimes while starting FlatCAM, and re-starting FlatCAM usually solves this error, so this is a minor bug:
 ```
+[DEBUG][MainThread] Radio toggled
+[INFO][MainThread] Radio type: <class 'PyQt5.QtCore.QThread'>
 Traceback (most recent call last):
-  File "C:\flatcam\GUIElements.py", line 48, in on_toggle
+  File "C:\flatcam\9.0shapely2.1.1\GUIElements.py", line 48, in on_toggle
     if radio.isChecked():
        ^^^^^^^^^^^^^^^
 AttributeError: 'QThread' object has no attribute 'isChecked'
