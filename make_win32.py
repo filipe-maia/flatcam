@@ -63,7 +63,7 @@ exec(compile(open('clean.py').read(), 'clean.py', 'exec'))
 setup(
     name="FlatCAM",
     author="Juan Pablo Caram",
-    version="9.0",
+    version="8.9",
     description="FlatCAM: 2D Computer Aided PCB Manufacturing",
     options=dict(build_exe=buildOptions),
     executables=[Executable("FlatCAM.py", icon='share/flatcam_icon48.ico', base=base)]

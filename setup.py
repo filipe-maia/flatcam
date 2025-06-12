@@ -13,7 +13,7 @@ import glob
 setup(
     name='FlatCAM',
 
-    version='9.0',
+    version='8.9',
 
     description='2D Computer-Aided PCB Manufacturing',
 
