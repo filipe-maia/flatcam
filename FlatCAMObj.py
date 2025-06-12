@@ -637,7 +637,7 @@ class FlatCAMGerber(FlatCAMObj, Gerber):
 
         # Make sure geometry is iterable.
         try:
-            _ = iter(geometry)
+            _ = iter(geometry.geoms)
         except TypeError:
             geometry = [geometry]
 
@@ -647,7 +647,7 @@ class FlatCAMGerber(FlatCAMObj, Gerber):
             linespec = 'k-'
 
         if self.options["solid"]:
-            for poly in geometry:
+            for poly in geometry.geoms:
                 # TODO: Too many things hardcoded.
                 try:
                     patch = PolygonPatch(poly,

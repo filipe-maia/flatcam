@@ -238,7 +238,7 @@ class Geometry(object):
             geoset = self.solid_geometry
 
         try:  # Iterable
-            for sub_geo in geoset:
+            for sub_geo in geoset.geoms:
                 p = self.find_polygon(point, geoset=sub_geo)
                 if p is not None:
                     return p
@@ -320,7 +320,7 @@ class Geometry(object):
 
         ## If iterable, expand recursively.
         try:
-            for geo in geometry:
+            for geo in geometry.geoms:
                 self.flatten(geometry=geo,
                              reset=False,
                              pathonly=pathonly)
@@ -533,7 +533,7 @@ class Geometry(object):
 
                 # current can be a MultiPolygon
                 try:
-                    for p in current:
+                    for p in current.geoms:
                         geoms.insert(p.exterior)
                         for i in p.interiors:
                             geoms.insert(i)
